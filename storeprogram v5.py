@@ -1,5 +1,6 @@
 from tkinter import * 
 from tkinter import messagebox
+import re 
 
 
 
@@ -170,19 +171,27 @@ class MainWindow:
             self.page_number.config(text= f"{MainWindow.index+1} of {MainWindow.page_amount}")
             print(receipt_list, MainWindow.index)
 
-            self.receipt_image.config(text= f"Store\n  \nname: {receipt_list[0]}\n reciept: {receipt_number} item: {receipt_list[1]}\n amount:{receipt_list[2]}")
+            self.receipt_image.config(text= f"Store\n  \nName: {receipt_list[0]}\n Reciept: {receipt_number} Item: {receipt_list[1]}\n Amount:{receipt_list[2]}")
             item_text = f"{receipt_list[0]} - {receipt_number} - {receipt_list[1]}({receipt_list[2]})"
             self.receipt_storage.insert(END, item_text)
         else: 
             messagebox.showerror("error", "receipt not found")
             
     def double_click (self, event):
-        selected_receipt = self.receipt_storage.curselection()
+        selected_receipt = self.receipt_storage.get(self.receipt_storage.curselection())
+        
+        if "Re" in selected_receipt: 
+            print('yes')
+            index = selected_receipt.find("Re")
+            print(index)
+        else:
+            print('bn')
+            
+        
+           
+       
+        
         self.SearchWindow.destroy()
-        
-        print (selected_receipt)
-        
-        
         
     def add(self): 
         name = self.name_entry.get().strip()
