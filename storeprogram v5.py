@@ -1,10 +1,5 @@
 from tkinter import * 
 from tkinter import messagebox
-import re 
-
-
-
-
 
 class MainWindow: 
     
@@ -13,6 +8,7 @@ class MainWindow:
     index = -1 
     page_amount = 0 
     def __init__(self, master):
+        self.search_window_active = False
         
 
         self.master = master 
@@ -85,7 +81,7 @@ class MainWindow:
         #self.search_button.grid()
 
     def search_window (self):
-        
+        self.search_window_active = True
         self.SearchWindow= Toplevel(root)
         self.SearchWindow.title('NEW')
         Label(self.SearchWindow, text='Advanced Search').grid(row=0, column=0, columnspan=2 )
@@ -171,26 +167,49 @@ class MainWindow:
             self.page_number.config(text= f"{MainWindow.index+1} of {MainWindow.page_amount}")
             print(receipt_list, MainWindow.index)
 
-            self.receipt_image.config(text= f"Store\n  \nName: {receipt_list[0]}\n Reciept: {receipt_number} Item: {receipt_list[1]}\n Amount:{receipt_list[2]}")
-            item_text = f"{receipt_list[0]} - {receipt_number} - {receipt_list[1]}({receipt_list[2]})"
-            self.receipt_storage.insert(END, item_text)
+            self.receipt_image.config(text= f"Store  \nName: {receipt_list[0]}\n Reciept: {receipt_number}\n Item: {receipt_list[1]}\n Amount:{receipt_list[2]}")
+            if self.search_window_active == True: 
+
+                item_text = f"Name: {receipt_list[0]} - Receipt: {receipt_number} - Item: {receipt_list[1]} Amount: {receipt_list[2]}"
+                self.receipt_storage.insert(END, item_text)
         else: 
             messagebox.showerror("error", "receipt not found")
             
     def double_click (self, event):
         selected_receipt = self.receipt_storage.get(self.receipt_storage.curselection())
         
-        if "Re" in selected_receipt: 
-            print('yes')
-            index = selected_receipt.find("Re")
-            print(index)
-        else:
-            print('bn')
+        
+        print('yes')
+        index_start = selected_receipt.find("Re")
+        print(index_start)
+
+        index_end = selected_receipt.find("Item")
+        print(index_end)
+        
+        receipt_number = selected_receipt[index_start+9: index_end-3].strip()
+        print (selected_receipt)
+        
+        receipt_list = MainWindow.receipt_dict[receipt_number]
+        MainWindow.index = MainWindow.receipt_list.index(receipt_number)
+        self.page_number.config(text = f"{MainWindow.index+1} of {MainWindow.page_amount}")
             
+        self.page_number.config(text= f"{MainWindow.index+1} of {MainWindow.page_amount}")
+        print(receipt_list, MainWindow.index)
+
+        self.receipt_image.config(text= f"Store \nName: {receipt_list[0]}\n Reciept: {receipt_number} Item: {receipt_list[1]}\n Amount:{receipt_list[2]}")
         
-           
+        if MainWindow.index+1 == MainWindow.page_amount: 
+            self.forward.config(state= DISABLED)
+            self.back.config(state= ACTIVE)
+        elif MainWindow.index+1 == 0:
+            self.forward.config(state= ACTIVE)
+            self.back.config(state= DISABLED)
+        else:
+            self.forward.config(state= ACTIVE)
+            self.back.config(state= ACTIVE)
+
        
-        
+        self.search_window_active = False
         self.SearchWindow.destroy()
         
     def add(self): 
