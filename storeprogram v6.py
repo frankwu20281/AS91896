@@ -10,11 +10,11 @@ class MainWindow:
     page_amount = 0 
     def __init__(self, master):
         self.search_window_active = False
-        
-
         self.master = master 
+        root.title("Receipts")
        
-        menubar = Menu(self.master)
+       
+        menubar = Menu(master)
         self.master.config(menu=menubar)
 
         tool_menu = Menu(menubar, tearoff= 0)
@@ -63,13 +63,14 @@ class MainWindow:
 
 
         SearchFrame = LabelFrame(frame, text= "Receipt Search")
-        SearchFrame.pack()
+        SearchFrame.pack(fill= X)
 
-        self.search_label = Label(SearchFrame, text= "Search receipts")
-        self.search_label.grid(row = 6, column= 0)
+        
         self.search_entry = Entry(SearchFrame)
         self.search_entry.bind("<Return>", (lambda event: self.receipt_search(self)))
-        self.search_entry.grid(row = 6, column= 1, columnspan= 3)
+        self.search_entry.pack(side= LEFT, fill= X, expand= True)
+        
+        Button(SearchFrame, text= "Advanced Search Menu", command= self.search_window).pack(side= LEFT)
         
         
         
@@ -94,36 +95,30 @@ class MainWindow:
 
     def search_window (self):
         self.search_window_active = True
-        self.all = False
+        master = Toplevel(root)
+        master.title('Advanced Search')
         
         
-        
-        
-        
-        
-        
-        self.SearchWindow= Toplevel(root)
-        self.SearchWindow.title('NEW')
-        Label(self.SearchWindow, text='Advanced Search').pack()
+        Label(master, text='Advanced Search').pack()
         self.dropdown= StringVar()
         self.dropdown.set("Select Search type")
         
-        self.dropdown_menu= OptionMenu(self.SearchWindow, self.dropdown, "Receipt", "Name", "Item", "Search All", command= self.adv_search)
+        self.dropdown_menu= OptionMenu(master, self.dropdown, "Receipt", "Name", "Item", "Search All", command= self.search_choice)
         
         self.dropdown_menu.pack()
 
-        self.adv_search_entry = Entry(self.SearchWindow)
-        self.adv_search_entry.bind ("<KeyRelease>", lambda event: self.adv_search(self))
+        self.adv_search_entry = Entry(master)
+        self.adv_search_entry.bind ("<KeyRelease>", lambda event: self.search_choice(self))
         self.adv_search_entry.pack(padx= 5, fill= X)
 
-        self.receipt_storage = Listbox(self.SearchWindow, width= 50)
+        self.receipt_storage = Listbox(master, width= 50)
         self.receipt_storage.bind('<Double-Button>', (lambda event: self.double_click(self)))
         #self.search_entry.bind("<Return>", (lambda event: self.adv_search(self)))
         self.receipt_storage.pack(pady= 5, padx=5, fill= X, anchor= S)
     
 
 
-    def adv_search(self, event):
+    def search_choice(self, event):
         
         
         self.receipt_storage.delete(0, END)
@@ -168,13 +163,13 @@ class MainWindow:
     def name_search(self, event):
         name = self.adv_search_entry.get().strip()
         
-        inlist = False
+        
 
         
         for receipt_number, receipt_list in MainWindow.receipt_dict.items():
             print (list)
             if list[0] == name:
-                inlist= True 
+                
                 
                 MainWindow.index = MainWindow.receipt_list.index(receipt_number)
                 self.page_number.config(text = f"{MainWindow.index+1} of {MainWindow.page_amount}")                                
@@ -191,13 +186,13 @@ class MainWindow:
     def item_search(self, event):
         item = self.adv_search_entry.get().strip()
         self.receipt_storage.delete(0, END)
-        inlist = False
+
 
         
         for receipt_number, receipt_list in MainWindow.receipt_dict.items():
             print (list)
             if list[1] == item:
-                inlist= True 
+
                 
                 MainWindow.index = MainWindow.receipt_list.index(receipt_number)
                 self.page_number.config(text = f"{MainWindow.index+1} of {MainWindow.page_amount}")                                
@@ -240,7 +235,7 @@ class MainWindow:
         
         
         print('yes')
-        index_start = selected_receipt.find("Re")
+        index_start = selected_receipt.find("Receipt")
         print(index_start)
 
         index_end = selected_receipt.find("Item")
@@ -270,7 +265,7 @@ class MainWindow:
 
        
         self.search_window_active = False
-        #self.SearchWindow.destroy()
+        #master.destroy()
         
     def add(self): 
         name = self.name_entry.get().strip()
