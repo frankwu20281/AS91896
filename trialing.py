@@ -13,25 +13,31 @@ class MainWindow:
         self.search_window_active = False
         self.master = master 
         root.title("Receipts")
-       
-       
+        root.geometry("700x300")
+        self.theme_colour ='SystemButtonFace'
         menubar = Menu(master)
-        self.master.config(menu=menubar)
-
+        master.config(menu=menubar)
         tool_menu = Menu(menubar, tearoff= 0)
-        tool_menu.add_command(label="Advanced Search", command= self.search_window)
-        tool_menu.add_command(label= "Exit", command= self.quit)
         menubar.add_cascade(label="Tools", menu= tool_menu )
+        
+        tool_menu.add_command(label="Advanced Search", command= self.search_window)
+        
+        
+        themes_submenu = Menu(tool_menu, tearoff= 0)
+        themes_submenu.add_command(label= "Light" ,command= lambda :self.themes("SystemButtonFace")) #SystemButtonFace for default colour
+    
+        themes_submenu.add_command(label= "Dark" ,command= lambda :self.themes("Black"))
+        tool_menu.add_cascade(label="Themes", menu= themes_submenu)
+        
+        tool_menu.add_separator()
+        tool_menu.add_command(label= "Exit", command= self.quit)
+        
 
     
         Label(root,text='Store').pack( anchor=N)
-
-        
-        
-        
         
         frame = Frame(root)
-        frame.pack(expand= True, fill=BOTH)
+        frame.pack( )
 
         EntryFrame=LabelFrame(frame, text= "fill out")
         EntryFrame.pack(side= LEFT, fill= BOTH) 
@@ -93,26 +99,35 @@ class MainWindow:
         
         #self.search_button = Button(master, text="Search", command= self.search)
         #self.search_button.grid()
-
+    def themes (self, colour ):
+        
+        
+        
+        root.config(bg= colour)
+        self.theme_colour = colour 
+            
+  
     def search_window (self):
         self.search_window_active = True
-        master = Toplevel(root)
-        master.title('Advanced Search')
+        SearchWindow = Toplevel(root)
         
+        SearchWindow.title('Advanced Search')
         
-        Label(master, text='Advanced Search').pack()
+        SearchWindow.config(bg= self.theme_colour)
+        
+        Label(SearchWindow, text='Advanced Search').pack()
         self.dropdown= StringVar()
         self.dropdown.set("Select Search type")
         
-        self.dropdown_menu= OptionMenu(master, self.dropdown, "Receipt", "Name", "Item", "Search All", command= self.search_choice)
+        self.dropdown_menu= OptionMenu(SearchWindow, self.dropdown, "Receipt", "Name", "Item", "Search All", command= self.search_choice)
         
         self.dropdown_menu.pack()
 
-        self.adv_search_entry = Entry(master)
+        self.adv_search_entry = Entry(SearchWindow)
         self.adv_search_entry.bind ("<KeyRelease>", lambda event: self.search_choice(self))
         self.adv_search_entry.pack(padx= 5, fill= X)
 
-        self.receipt_storage = Listbox(master, width= 50)
+        self.receipt_storage = Listbox(SearchWindow, width= 50)
         self.receipt_storage.bind('<Double-Button>', (lambda event: self.double_click(self)))
         #self.search_entry.bind("<Return>", (lambda event: self.adv_search(self)))
         self.receipt_storage.pack(pady= 5, padx=5, fill= X, anchor= S)
@@ -153,6 +168,8 @@ class MainWindow:
                 self.receipt_storage.insert(END, search)
             elif typed.lower() in search.lower():
                 self.receipt_storage.insert(END, search)
+        else:
+            self.receipt_storage.insert(END, "No Search Results")
                 
             
        
@@ -178,8 +195,9 @@ class MainWindow:
                 print(MainWindow.receipt_dict[receipt_number], "yes")
                 item_text = f"Name: {receipt_list[0]} - Receipt: {receipt_number} - Item: {receipt_list[1]} - Amount: {receipt_list[2]}"
                 self.receipt_storage.insert(END, item_text)
-            else:
-                print('no')
+        else:
+            print('no')
+            self.receipt_storage.insert(END, "No Search Results")
         
         ###if inlist == False:
             ###messagebox.showerror("error", "receipts with this name not found")###
@@ -201,9 +219,9 @@ class MainWindow:
                 print(MainWindow.receipt_dict[receipt_number], "yes")
                 item_text = f"Name: {receipt_list[0]} - Receipt: {receipt_number} - Item: {receipt_list[1]} - Amount: {receipt_list[2]}"
                 self.receipt_storage.insert(END, item_text)
-            else:
-                print('no')
         
+        else:
+            self.receipt_storage.insert(END, "No Search Results")        
         #if inlist == False:
             #messagebox.showerror("error", "receipts with this item not found")
         
@@ -221,6 +239,8 @@ class MainWindow:
 
                 item_text = f"Name: {MainWindow.receipt_dict[receipt_number][0]} - Receipt: {receipt_number} - Item: {MainWindow.receipt_dict[receipt_number][1]} Amount: {MainWindow.receipt_dict[receipt_number][2]}"
                 self.receipt_storage.insert(END, item_text)
+        else:
+            self.receipt_storage.insert(END, "No Search Results")
         #else: 
             #messagebox.showerror("error", "receipt not found")
             
