@@ -1,6 +1,6 @@
 from tkinter import * 
 from tkinter import messagebox
-import re 
+
 
 class MainWindow: 
     
@@ -9,9 +9,7 @@ class MainWindow:
     index = -1 
     page_amount = 0 
     def __init__(self, master):
-        a = "s"
-        b = "b"
-        print (a+b)
+    
         self.search_window_active = False
         self.master = master 
         root.title("Receipts")
@@ -150,11 +148,11 @@ class MainWindow:
         
             
         
-        for a in self.search_list:
+        for search in self.search_list:
             if typed == "":
-                self.receipt_storage.insert(END, a)
-            elif typed.lower() in a.lower():
-                self.receipt_storage.insert(END, a)
+                self.receipt_storage.insert(END, search)
+            elif typed.lower() in search.lower():
+                self.receipt_storage.insert(END, search)
                 
             
        
@@ -218,17 +216,10 @@ class MainWindow:
             receipt_number = self.search_entry.get()
         if receipt_number in MainWindow.receipt_list: 
             
-            receipt_list = MainWindow.receipt_dict[receipt_number]
-            MainWindow.index = MainWindow.receipt_list.index(receipt_number)
-            self.page_number.config(text = f"{MainWindow.index+1} of {MainWindow.page_amount}")
-            
-            self.page_number.config(text= f"{MainWindow.index+1} of {MainWindow.page_amount}")
-            print(receipt_list, MainWindow.index)
-
-            self.receipt_image.config(text= f"Store  \nName: {receipt_list[0]}\n Reciept: {receipt_number}\n Item: {receipt_list[1]}\n Amount:{receipt_list[2]}")
+            self.receipt_shifting(receipt_number)
             if self.search_window_active == True: 
 
-                item_text = f"Name: {receipt_list[0]} - Receipt: {receipt_number} - Item: {receipt_list[1]} Amount: {receipt_list[2]}"
+                item_text = f"Name: {MainWindow.receipt_dict[receipt_number][0]} - Receipt: {receipt_number} - Item: {MainWindow.receipt_dict[receipt_number][1]} Amount: {MainWindow.receipt_dict[receipt_number][2]}"
                 self.receipt_storage.insert(END, item_text)
         #else: 
             #messagebox.showerror("error", "receipt not found")
@@ -237,24 +228,27 @@ class MainWindow:
         selected_receipt = self.receipt_storage.get(self.receipt_storage.curselection())
         
         
-        print('yes')
-        index_start = selected_receipt.find("Receipt")
-        print(index_start)
-
-        index_end = selected_receipt.find("Item")
-        print(index_end)
-        
-        receipt_number = selected_receipt[index_start+9: index_end-3].strip()
+       
+        receipt_number = selected_receipt[selected_receipt.find("Receipt")+9: selected_receipt.find("Item")-3].strip()
         print (selected_receipt)
+        
+        self.receipt_shifting(receipt_number)
+
+       
+        self.search_window_active = False
+        #master.destroy()
+    
+    def receipt_shifting (self,receipt_number):
         
         receipt_list = MainWindow.receipt_dict[receipt_number]
         MainWindow.index = MainWindow.receipt_list.index(receipt_number)
+        
         self.page_number.config(text = f"{MainWindow.index+1} of {MainWindow.page_amount}")
             
         self.page_number.config(text= f"{MainWindow.index+1} of {MainWindow.page_amount}")
         print(receipt_list, MainWindow.index)
 
-        self.receipt_image.config(text= f"Store \nName: {receipt_list[0]}\n Reciept: {receipt_number} Item: {receipt_list[1]}\n Amount:{receipt_list[2]}")
+        self.receipt_image.config(text= f"Store \nName: {receipt_list[0]}\n Reciept: {receipt_number}\n Item: {receipt_list[1]}\n Amount:{receipt_list[2]}")
         
         if MainWindow.index+1 == MainWindow.page_amount: 
             self.forward.config(state= DISABLED)
@@ -262,61 +256,54 @@ class MainWindow:
         elif MainWindow.index == 0:
             self.forward.config(state= ACTIVE)
             self.back.config(state= DISABLED)
+        elif MainWindow.page_amount == 1: 
+            self.forward.config(state= DISABLED)
+            self.back.config(state= DISABLED)
         else:
             self.forward.config(state= ACTIVE)
             self.back.config(state= ACTIVE)
-
-       
-        self.search_window_active = False
-        #master.destroy()
-        
+            
     def add(self): 
         name = self.name_entry.get().strip()
         item = self.item_entry.get().strip()
         amount = self.amount_entry.get().strip()
-        receipt = self.receipt_entry.get().strip()
+        receipt_number = self.receipt_entry.get().strip()
         error = False
         error_text = []
         
         
+        
             
             
-        if receipt in MainWindow.receipt_list or any(number.isdigit() for number in receipt) or not receipt or not receipt.isdigit():
+        if receipt_number in MainWindow.receipt_list or not receipt_number or not receipt_number.isdigit():
             #messagebox.showerror("error", "enter different receipt number")
             
             error = True 
-            error_text.append("Receipt number")
+            error_text.append("Receipt-number")
         if any(number.isdigit() for number in name) or not name:
             error = True
             error_text.append("name")
-        if not any(number.isdigit() for number in item) or not item:
+        if  any(number.isdigit() for number in item) or not item:
             error = True 
             error_text.append("item")
         if not amount or not amount.isdigit() or int(amount)>500 or int(amount)<1:
             error = True 
-            error_text.append("item amount")
+            error_text.append("item-amount")
             
         if error == True: 
             #messagebox.showerror("error", f"Invalid { ' '.join(map(str, error_text))}")
-            a = ' '.join(map(str, error_text))
-            messagebox.showerror("error", f"Invalid { a.replace(' ', ', ')}")
+            error_text = ', '.join(map(str, error_text))
+            messagebox.showerror("error", f"Invalid { error_text}")
         else:
-            MainWindow.receipt_dict.update({receipt: [name,item, amount]})
-            MainWindow.receipt_list.append(receipt)
-            print (MainWindow.receipt_dict)
-            self.receipt_image.config(text= f"Store \nname: {name} \n reciept: {receipt} \n item: {item}\n amount:{amount}")
-            
-            MainWindow.index = MainWindow.page_amount 
+            MainWindow.receipt_dict.update({receipt_number: [name,item, amount]})
+            MainWindow.receipt_list.append(receipt_number)
             MainWindow.page_amount += 1
-            print(MainWindow.index)
-            self.page_number.config(text = f"{MainWindow.index+1} of {MainWindow.page_amount}")
-            if MainWindow.page_amount == 1:
-                self.forward.config(state= DISABLED)
-                self.back.config(state= DISABLED)
-            else:
-                self.forward.config(state= DISABLED)
-                self.back.config(state= ACTIVE)
-      
+            self.receipt_shifting(receipt_number)
+        
+        
+                      
+    
+        
         
             
             
@@ -326,21 +313,7 @@ class MainWindow:
         self.back.config(state=ACTIVE)
         
         receipt_number = MainWindow.receipt_list[MainWindow.index]
-        print(receipt_number)
-        receipt_list = MainWindow.receipt_dict[receipt_number]
-        
-        
-        self.page_number.config(text= f"{MainWindow.index+1} of {MainWindow.page_amount}")
-        print(receipt_list, MainWindow.index)
-
-        self.receipt_image.config(text= f"Store \nname: {receipt_list[0]} \n reciept: {receipt_number} \n item: {receipt_list[1]}\n amount:{receipt_list[2]}")
-        
-        if MainWindow.index+1 == MainWindow.page_amount:
-            self.forward.config(state=DISABLED)
-        else:
-            self.forward.config(state= ACTIVE)
-        
-    
+        self.receipt_shifting(receipt_number)
     def previous_receipt(self): 
         MainWindow.index -= 1
         self.forward.config(state=ACTIVE)
@@ -351,15 +324,7 @@ class MainWindow:
         print(receipt_number)
         receipt_list = MainWindow.receipt_dict[receipt_number]
         
-        self.page_number.config(text= f"{MainWindow.index+1} of {MainWindow.page_amount}")
-        print(receipt_list, MainWindow.index)
-
-        self.receipt_image.config(text= f"Store \nname: {receipt_list[0]} \n reciept: {receipt_number} \n item: {receipt_list[1]}\n amount:{receipt_list[2]}")
-
-        if MainWindow.index == 0:
-            self.back.config(state=DISABLED)
-        else:
-            self.back.config(state= ACTIVE)
+        self.receipt_shifting(receipt_number)
 
     def quit (self):
         root.destroy()
