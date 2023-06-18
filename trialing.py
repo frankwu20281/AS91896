@@ -64,7 +64,7 @@ class MainWindow:
         self.amount_entry. grid (row=3, column=1)
 
         Button(EntryFrame, text= "Buy", command= self.add).grid(row=5, column=0)
-        Button(EntryFrame, text = "Return", command = self.add).grid(row=5,column=1)
+        Button(EntryFrame, text = "Return", command = self.delete).grid(row=5,column=1)
        
         
 
@@ -282,7 +282,25 @@ class MainWindow:
         else:
             self.forward.config(state= ACTIVE)
             self.back.config(state= ACTIVE)
+    def delete (self):
+        print(MainWindow.index)
+        try:
+            receipt_number = MainWindow.receipt_list[MainWindow.index]
+            print(receipt_number)
+        except IndexError: 
+            messagebox.showerror("ERROR", "There are no receipts to return")
+        else:
+            MainWindow.receipt_dict.pop(receipt_number)
+            MainWindow.receipt_list.remove(receipt_number)
+            print(MainWindow.receipt_dict)
+            MainWindow.index -= 1
+            if MainWindow.index == -1: 
+                self.receipt_image.config(text= f"\n\n\n\n")
+            else:
+                self.receipt_shifting(receipt_number=MainWindow.receipt_list[MainWindow.index])
             
+        
+    
     def add(self): 
         name = self.name_entry.get().strip()
         item = self.item_entry.get().strip()
@@ -312,8 +330,8 @@ class MainWindow:
             
         if error == True: 
             #messagebox.showerror("error", f"Invalid { ' '.join(map(str, error_text))}")
-            error_text = ', '.join(map(str, error_text))
-            messagebox.showerror("error", f"Invalid { error_text}")
+            
+            messagebox.showerror("error", f"Invalid { ', '.join(map(str, error_text))}")
         else:
             MainWindow.receipt_dict.update({receipt_number: [name,item, amount]})
             MainWindow.receipt_list.append(receipt_number)
