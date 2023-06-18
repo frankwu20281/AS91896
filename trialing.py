@@ -4,17 +4,21 @@ from tkinter import messagebox
 
 class MainWindow: 
     
-    receipt_list = []
-    receipt_dict ={}
-    index = -1 
-    page_amount = 0 
+    receipt_list = []   #list to store receipt
+    receipt_dict ={}    #dictionary to store receipt data using receipt number as key 
+    index = -1          #counter to keep count what receipt in the list the program currently is displaying/using, start at -1 because 0 is the item in list
+    page_amount = 0     #keep count of the total amount of receipts in the program 
     def __init__(self, master):
     
-        self.search_window_active = False
+        #config the program window
         self.master = master 
         root.title("Receipts")
         root.geometry("700x300")
+
+        self.search_window_active = False
         self.theme_colour ='SystemButtonFace'
+
+        #creating menu bar
         menubar = Menu(master)
         master.config(menu=menubar)
         tool_menu = Menu(menubar, tearoff= 0)
@@ -32,13 +36,14 @@ class MainWindow:
         tool_menu.add_separator()
         tool_menu.add_command(label= "Exit", command= self.quit)
         
-
-    
-        Label(root,text='Store').pack( anchor=N)
-        
+        #creating 'master' frame to put all ui stuff in
         frame = Frame(root)
         frame.pack( )
 
+        Label(root,text='Store').pack( anchor=N)
+        
+        
+        #frame with all the user entry stuff 
         EntryFrame=LabelFrame(frame, text= "fill out")
         EntryFrame.pack(side= LEFT, fill= BOTH) 
 
@@ -68,24 +73,24 @@ class MainWindow:
        
         
 
-
+        # frame with the receipt search bar 
         SearchFrame = LabelFrame(frame, text= "Receipt Search")
         SearchFrame.pack(fill= X)
 
         
         self.search_entry = Entry(SearchFrame)
-        self.search_entry.bind("<Return>", (lambda event: self.receipt_search(self)))
+        self.search_entry.bind("<KeyRelease>", (lambda event: self.receipt_search(self)))
         self.search_entry.pack(side= LEFT, fill= X, expand= True)
         
         Button(SearchFrame, text= "Advanced Search Menu", command= self.search_window).pack(side= LEFT)
         
         
         
-        
+        #frame with the receipt display stuff 
         DisplayFrame=LabelFrame(frame, text= "Receipt")
         DisplayFrame.pack( fill=  BOTH, expand= TRUE)
 
-        self.receipt_image = Label(DisplayFrame, text="\n\n\n\n")
+        self.receipt_image = Label(DisplayFrame, text="No receipts\n\n\n\n")
         self.receipt_image.pack(fill= X)
 
         self.back = Button(DisplayFrame, text="<-", command= self.previous_receipt, state= DISABLED)
@@ -97,8 +102,7 @@ class MainWindow:
         self.forward = Button(DisplayFrame, text= "->", command= self.next_receipt, state= DISABLED)
         self.forward.pack(side= LEFT)
         
-        #self.search_button = Button(master, text="Search", command= self.search)
-        #self.search_button.grid()
+        
     def themes (self, colour ):
         
         
@@ -263,10 +267,11 @@ class MainWindow:
         receipt_list = MainWindow.receipt_dict[receipt_number]
         MainWindow.index = MainWindow.receipt_list.index(receipt_number)
         
-        self.page_number.config(text = f"{MainWindow.index+1} of {MainWindow.page_amount}")
+        
             
         self.page_number.config(text= f"{MainWindow.index+1} of {MainWindow.page_amount}")
-        print(receipt_list, MainWindow.index)
+        print(receipt_list, "receipt list", MainWindow.index, " index")
+        print (MainWindow.receipt_dict, "whole dict")
 
         self.receipt_image.config(text= f"Store \nName: {receipt_list[0]}\n Reciept: {receipt_number}\n Item: {receipt_list[1]}\n Amount:{receipt_list[2]}")
         
@@ -292,10 +297,12 @@ class MainWindow:
         else:
             MainWindow.receipt_dict.pop(receipt_number)
             MainWindow.receipt_list.remove(receipt_number)
-            print(MainWindow.receipt_dict)
-            MainWindow.index -= 1
-            if MainWindow.index == -1: 
-                self.receipt_image.config(text= f"\n\n\n\n")
+            MainWindow.page_amount -= 1 
+            MainWindow.index -= 1 
+            
+            if MainWindow.page_amount == 0: 
+                self.receipt_image.config(text= f"No receipts\n\n\n\n")
+                self.page_number.config(text = f"{MainWindow.index+1} of {MainWindow.page_amount}")
             else:
                 self.receipt_shifting(receipt_number=MainWindow.receipt_list[MainWindow.index])
             
