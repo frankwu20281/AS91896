@@ -1,6 +1,6 @@
 from tkinter import * 
 from tkinter import messagebox
-
+from random import randint
 
 class MainWindow: 
     
@@ -53,23 +53,20 @@ class MainWindow:
         self.name_entry.grid(row=0, column=1)
 
 
-        self.receipt_label = Label(EntryFrame, text = "enter receipt number")
-        self.receipt_label.grid(row= 1, column= 0)
-        self.receipt_entry = Entry(EntryFrame)
-        self.receipt_entry.grid(row=1, column=1 )
+        
 
         self.item_label = Label(EntryFrame, text= "enter item name")
-        self.item_label.grid(row=2, column= 0)
+        self.item_label.grid(row=1, column= 0)
         self.item_entry = Entry(EntryFrame)
-        self.item_entry.grid(row=2, column=1)
+        self.item_entry.grid(row=1, column=1)
 
         self.amount_label = Label(EntryFrame, text= "enter item amount")
-        self.amount_label.grid(row=3, column= 0)
+        self.amount_label.grid(row=2, column= 0)
         self.amount_entry = Spinbox(EntryFrame, from_ = 1,to = 500)
-        self.amount_entry. grid (row=3, column=1)
+        self.amount_entry. grid (row=2, column=1)
 
-        Button(EntryFrame, text= "Buy", command= self.add).grid(row=5, column=0)
-        Button(EntryFrame, text = "Return", command = self.delete).grid(row=5,column=1)
+        Button(EntryFrame, text= "Buy", command= self.add).grid(row=3, column=0)
+        Button(EntryFrame, text = "Return", command = self.delete).grid(row=3,column=1)
        
         
 
@@ -79,7 +76,7 @@ class MainWindow:
 
         
         self.search_entry = Entry(SearchFrame)
-        self.search_entry.bind("<KeyRelease>", (lambda event: self.receipt_search(self)))
+        self.search_entry.bind("<KeyRelease>", (lambda event: self.receipt_search(self.search_entry.get(), self)))
         self.search_entry.pack(side= LEFT, fill= X, expand= True)
         
         Button(SearchFrame, text= "Advanced Search Menu", command= self.search_window).pack(side= LEFT)
@@ -147,7 +144,7 @@ class MainWindow:
         if choice == "Name":
             MainWindow.name_search(self, event)
         elif choice =="Receipt":
-            MainWindow.receipt_search(self, event) 
+            MainWindow.receipt_search(self, self.adv_search_entry.get(), event) 
         elif choice == "Item":
             MainWindow.item_search(self, event)
         elif choice == "Search All":
@@ -189,8 +186,8 @@ class MainWindow:
 
         
         for receipt_number, receipt_list in MainWindow.receipt_dict.items():
-            print (list)
-            if list[0] == name:
+            print (receipt_list)
+            if receipt_list[0] == name:
                 
                 
                 MainWindow.index = MainWindow.receipt_list.index(receipt_number)
@@ -213,8 +210,8 @@ class MainWindow:
 
         
         for receipt_number, receipt_list in MainWindow.receipt_dict.items():
-            print (list)
-            if list[1] == item:
+            print (receipt_list)
+            if receipt_list[1] == item:
 
                 
                 MainWindow.index = MainWindow.receipt_list.index(receipt_number)
@@ -230,21 +227,23 @@ class MainWindow:
             #messagebox.showerror("error", "receipts with this item not found")
         
 
-    def receipt_search (self,event):
+    def receipt_search (self,receipt_number,event):
         
-        if self.search_window_active == True:
-            receipt_number = self.adv_search_entry.get()
-        else:
-            receipt_number = self.search_entry.get()
-        if receipt_number in MainWindow.receipt_list: 
-            
-            self.receipt_shifting(receipt_number)
-            if self.search_window_active == True: 
+        
 
-                item_text = f"Name: {MainWindow.receipt_dict[receipt_number][0]} - Receipt: {receipt_number} - Item: {MainWindow.receipt_dict[receipt_number][1]} Amount: {MainWindow.receipt_dict[receipt_number][2]}"
-                self.receipt_storage.insert(END, item_text)
+
+        try:
+            receipt_number = int(receipt_number)
+        except ValueError:
+            pass
+            
         else:
-            self.receipt_storage.insert(END, "No Search Results")
+            if receipt_number in MainWindow.receipt_list: 
+                self.receipt_shifting(receipt_number)
+                if self.search_window_active == True: 
+
+                    item_text = f"Name: {MainWindow.receipt_dict[receipt_number][0]} - Receipt: {receipt_number} - Item: {MainWindow.receipt_dict[receipt_number][1]} Amount: {MainWindow.receipt_dict[receipt_number][2]}"
+                    self.receipt_storage.insert(END, item_text)
         #else: 
             #messagebox.showerror("error", "receipt not found")
             
@@ -256,7 +255,7 @@ class MainWindow:
         receipt_number = selected_receipt[selected_receipt.find("Receipt")+9: selected_receipt.find("Item")-3].strip()
         print (selected_receipt)
         
-        self.receipt_shifting(receipt_number)
+        self.receipt_shifting(int(receipt_number))
 
        
         self.search_window_active = False
@@ -274,16 +273,16 @@ class MainWindow:
         print (MainWindow.receipt_dict, "whole dict")
 
         self.receipt_image.config(text= f"Store \nName: {receipt_list[0]}\n Reciept: {receipt_number}\n Item: {receipt_list[1]}\n Amount:{receipt_list[2]}")
-        
-        if MainWindow.index+1 == MainWindow.page_amount: 
+        if MainWindow.page_amount == 1 and MainWindow.index ==0 : 
+            self.forward.config(state= DISABLED)
+            self.back.config(state= DISABLED)
+        elif MainWindow.index+1 == MainWindow.page_amount: 
             self.forward.config(state= DISABLED)
             self.back.config(state= ACTIVE)
         elif MainWindow.index == 0:
             self.forward.config(state= ACTIVE)
             self.back.config(state= DISABLED)
-        elif MainWindow.page_amount == 1: 
-            self.forward.config(state= DISABLED)
-            self.back.config(state= DISABLED)
+
         else:
             self.forward.config(state= ACTIVE)
             self.back.config(state= ACTIVE)
@@ -312,19 +311,19 @@ class MainWindow:
         name = self.name_entry.get().strip()
         item = self.item_entry.get().strip()
         amount = self.amount_entry.get().strip()
-        receipt_number = self.receipt_entry.get().strip()
+        
         error = False
         error_text = []
         
+        while True:
+            receipt_number = randint(100,999)
+            if receipt_number in MainWindow.receipt_list:
+                receipt_number = randint(100,999)
+            else:
+                break
+            
+            
         
-        
-            
-            
-        if receipt_number in MainWindow.receipt_list or not receipt_number or not receipt_number.isdigit():
-            #messagebox.showerror("error", "enter different receipt number")
-            
-            error = True 
-            error_text.append("Receipt-number")
         if any(number.isdigit() for number in name) or not name:
             error = True
             error_text.append("name")
