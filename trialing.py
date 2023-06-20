@@ -42,7 +42,6 @@ class MainWindow:
 
         Label(root,text='Store').pack( anchor=N)
         
-        
         #frame with all the user entry stuff 
         EntryFrame=LabelFrame(frame, text= "fill out")
         EntryFrame.pack(side= LEFT, fill= BOTH) 
@@ -51,9 +50,6 @@ class MainWindow:
         self.name_label.grid(row=0, column=0)
         self.name_entry = Entry(EntryFrame)
         self.name_entry.grid(row=0, column=1)
-
-
-        
 
         self.item_label = Label(EntryFrame, text= "enter item name")
         self.item_label.grid(row=1, column= 0)
@@ -65,10 +61,11 @@ class MainWindow:
         self.amount_entry = Spinbox(EntryFrame, from_ = 1,to = 500)
         self.amount_entry. grid (row=2, column=1)
 
-        Button(EntryFrame, text= "Buy", command= self.add).grid(row=3, column=0)
-        Button(EntryFrame, text = "Return", command = self.delete).grid(row=3,column=1)
-       
+        Button(EntryFrame, text= "Buy", command= lambda : self.add(self.name_entry.get().strip().lower(),self.item_entry.get().strip().lower()
+                , self.amount_entry.get().strip().lower())).grid(row=3, column=0)
         
+        
+        Button(EntryFrame, text = "Return", command = self.delete).grid(row=3,column=1)
 
         # frame with the receipt search bar 
         SearchFrame = LabelFrame(frame, text= "Receipt Search")
@@ -76,12 +73,11 @@ class MainWindow:
 
         
         self.search_entry = Entry(SearchFrame)
-        self.search_entry.bind("<KeyRelease>", (lambda event: self.receipt_search(self.search_entry.get(), self)))
+        self.search_entry.bind("<KeyRelease>", (lambda event: self.receipt_search(self.search_entry.get(), False)))
         self.search_entry.pack(side= LEFT, fill= X, expand= True)
         
         Button(SearchFrame, text= "Advanced Search Menu", command= self.search_window).pack(side= LEFT)
-        
-        
+
         
         #frame with the receipt display stuff 
         DisplayFrame=LabelFrame(frame, text= "Receipt")
@@ -101,9 +97,7 @@ class MainWindow:
         
         
     def themes (self, colour ):
-        
-        
-        
+
         root.config(bg= colour)
         self.theme_colour = colour 
             
@@ -133,8 +127,6 @@ class MainWindow:
         #self.search_entry.bind("<Return>", (lambda event: self.adv_search(self)))
         self.receipt_storage.pack(pady= 5, padx=5, fill= X, anchor= S)
     
-
-
     def search_choice(self, event):
         
         
@@ -142,95 +134,59 @@ class MainWindow:
         choice = self.dropdown.get()
     
         if choice == "Name":
-            MainWindow.name_search(self, event)
+            self.name_and_item_search(self.adv_search_entry.get().strip(),  0 )
         elif choice =="Receipt":
-            MainWindow.receipt_search(self, self.adv_search_entry.get(), event) 
+            MainWindow.receipt_search(self, self.adv_search_entry.get(), TRUE) 
         elif choice == "Item":
-            MainWindow.item_search(self, event)
+            MainWindow.name_and_item_search(self,self.adv_search_entry.get().strip(), 1)
         elif choice == "Search All":
             
-            MainWindow.all_search(self, event)
+            MainWindow.all_search(self)
 
-    def all_search(self, event):
-        print('start')
-        self.search_list =[]
+    def all_search(self):
+       
+        print('allsearchstart')
+        search_list =[]
         typed = self.adv_search_entry.get()
         
         for receipt_number, receipt_list in MainWindow.receipt_dict.items():
             
-            print(receipt_list, "yes")
+            print(receipt_list, "- receipt list")
             item_text = f"Name: {receipt_list[0]} - Receipt: {receipt_number} - Item: {receipt_list[1]} - Amount: {receipt_list[2]}"
-            self.search_list.append(item_text)
+            search_list.append(item_text)
         
             
         
-        for search in self.search_list:
+        for search in search_list:
             if typed == "":
                 self.receipt_storage.insert(END, search)
             elif typed.lower() in search.lower():
                 self.receipt_storage.insert(END, search)
-        else:
-            self.receipt_storage.insert(END, "No Search Results")
-                
-            
-       
-            
-            
-        print ('done')
-        
-
-    def name_search(self, event):
-        name = self.adv_search_entry.get().strip()
-        
-        
-
-        
-        for receipt_number, receipt_list in MainWindow.receipt_dict.items():
-            print (receipt_list)
-            if receipt_list[0] == name:
-                
-                
-                MainWindow.index = MainWindow.receipt_list.index(receipt_number)
-                self.page_number.config(text = f"{MainWindow.index+1} of {MainWindow.page_amount}")                                
-                self.page_number.config(text= f"{MainWindow.index+1} of {MainWindow.page_amount}")
-                print(MainWindow.receipt_dict[receipt_number], "yes")
-                item_text = f"Name: {receipt_list[0]} - Receipt: {receipt_number} - Item: {receipt_list[1]} - Amount: {receipt_list[2]}"
-                self.receipt_storage.insert(END, item_text)
-        else:
+        if not self.receipt_storage.get(0):
             print('no')
             self.receipt_storage.insert(END, "No Search Results")
+
         
-        ###if inlist == False:
-            ###messagebox.showerror("error", "receipts with this name not found")###
-    
-    def item_search(self, event):
-        item = self.adv_search_entry.get().strip()
-        self.receipt_storage.delete(0, END)
+        
 
-
+    def name_and_item_search(self, search_field, index):
         
         for receipt_number, receipt_list in MainWindow.receipt_dict.items():
-            print (receipt_list)
-            if receipt_list[1] == item:
-
+            print (receipt_list, '-receipt list')
+            if receipt_list[index] == search_field:
+                
                 
                 MainWindow.index = MainWindow.receipt_list.index(receipt_number)
                 self.page_number.config(text = f"{MainWindow.index+1} of {MainWindow.page_amount}")                                
                 self.page_number.config(text= f"{MainWindow.index+1} of {MainWindow.page_amount}")
-                print(MainWindow.receipt_dict[receipt_number], "yes")
+                print(MainWindow.receipt_dict[receipt_number], "-found")
                 item_text = f"Name: {receipt_list[0]} - Receipt: {receipt_number} - Item: {receipt_list[1]} - Amount: {receipt_list[2]}"
                 self.receipt_storage.insert(END, item_text)
-        
-        else:
-            self.receipt_storage.insert(END, "No Search Results")        
-        #if inlist == False:
-            #messagebox.showerror("error", "receipts with this item not found")
-        
+        if not self.receipt_storage.get(0):
+            print('no')
+            self.receipt_storage.insert(END, "No Search Results")
 
-    def receipt_search (self,receipt_number,event):
-        
-        
-
+    def receipt_search (self,receipt_number, active):
 
         try:
             receipt_number = int(receipt_number)
@@ -240,12 +196,13 @@ class MainWindow:
         else:
             if receipt_number in MainWindow.receipt_list: 
                 self.receipt_shifting(receipt_number)
-                if self.search_window_active == True: 
+                if active == True: 
 
                     item_text = f"Name: {MainWindow.receipt_dict[receipt_number][0]} - Receipt: {receipt_number} - Item: {MainWindow.receipt_dict[receipt_number][1]} Amount: {MainWindow.receipt_dict[receipt_number][2]}"
                     self.receipt_storage.insert(END, item_text)
-        #else: 
-            #messagebox.showerror("error", "receipt not found")
+        if active == True and not self.receipt_storage.get(0) :
+            print('no')
+            self.receipt_storage.insert(END, "No Search Results")
             
     def double_click (self, event):
         selected_receipt = self.receipt_storage.get(self.receipt_storage.curselection())
@@ -266,8 +223,6 @@ class MainWindow:
         receipt_list = MainWindow.receipt_dict[receipt_number]
         MainWindow.index = MainWindow.receipt_list.index(receipt_number)
         
-        
-            
         self.page_number.config(text= f"{MainWindow.index+1} of {MainWindow.page_amount}")
         print(receipt_list, "receipt list", MainWindow.index, " index")
         print (MainWindow.receipt_dict, "whole dict")
@@ -305,12 +260,9 @@ class MainWindow:
             else:
                 self.receipt_shifting(receipt_number=MainWindow.receipt_list[MainWindow.index])
             
-        
     
-    def add(self): 
-        name = self.name_entry.get().strip()
-        item = self.item_entry.get().strip()
-        amount = self.amount_entry.get().strip()
+    def add(self, name, item, amount): 
+        
         
         error = False
         error_text = []
@@ -320,9 +272,7 @@ class MainWindow:
             if receipt_number in MainWindow.receipt_list:
                 receipt_number = randint(100,999)
             else:
-                break
-            
-            
+                break  
         
         if any(number.isdigit() for number in name) or not name:
             error = True
@@ -335,7 +285,6 @@ class MainWindow:
             error_text.append("item-amount")
             
         if error == True: 
-            #messagebox.showerror("error", f"Invalid { ' '.join(map(str, error_text))}")
             
             messagebox.showerror("error", f"Invalid { ', '.join(map(str, error_text))}")
         else:
@@ -344,13 +293,7 @@ class MainWindow:
             MainWindow.page_amount += 1
             self.receipt_shifting(receipt_number)
         
-        
-                      
     
-        
-        
-            
-            
     def next_receipt(self): 
         MainWindow.index += 1
         self.forward.config(state=ACTIVE)
