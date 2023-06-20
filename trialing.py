@@ -96,16 +96,16 @@ class MainWindow:
         self.forward.pack(side= LEFT)
         
         
-    def themes (self, colour ):
+    def themes (self, colour ): #function to control colour theme of the whole program
 
         root.config(bg= colour)
         self.theme_colour = colour 
             
   
-    def search_window (self):
+    def search_window (self):   #function to initiate advanced search window 
+        #window config stuff
         self.search_window_active = True
         SearchWindow = Toplevel(root)
-        
         SearchWindow.title('Advanced Search')
         
         SearchWindow.config(bg= self.theme_colour)
@@ -114,20 +114,21 @@ class MainWindow:
         self.dropdown= StringVar()
         self.dropdown.set("Select Search type")
         
+        #dropdown menu for user to choose what search option they want
         self.dropdown_menu= OptionMenu(SearchWindow, self.dropdown, "Receipt", "Name", "Item", "Search All", command= self.search_choice)
-        
         self.dropdown_menu.pack()
-
+        
+        #entry box for user to enter their search, binded to keyrelease so program will run search_choice function every time user stops typing  
         self.adv_search_entry = Entry(SearchWindow)
         self.adv_search_entry.bind ("<KeyRelease>", lambda event: self.search_choice(self))
         self.adv_search_entry.pack(padx= 5, fill= X)
-
+        #listbox to show users search results, when user double clicks on option it displays it on main window
         self.receipt_storage = Listbox(SearchWindow, width= 50)
         self.receipt_storage.bind('<Double-Button>', (lambda event: self.double_click(self)))
         #self.search_entry.bind("<Return>", (lambda event: self.adv_search(self)))
         self.receipt_storage.pack(pady= 5, padx=5, fill= X, anchor= S)
     
-    def search_choice(self, event):
+    def search_choice(self, event): #check what search option user wants
         
         
         self.receipt_storage.delete(0, END)
@@ -143,37 +144,37 @@ class MainWindow:
             
             MainWindow.all_search(self)
 
-    def all_search(self):
+    def all_search(self):   #search all function for the advanced search window 
        
         print('allsearchstart')
         search_list =[]
-        typed = self.adv_search_entry.get()
+        typed = self.adv_search_entry.get() #see what user has typed
         
-        for receipt_number, receipt_list in MainWindow.receipt_dict.items():
+        for receipt_number, receipt_list in MainWindow.receipt_dict.items(): #get the receipt number (key), and receipt list (value of key)
             
             print(receipt_list, "- receipt list")
             item_text = f"Name: {receipt_list[0]} - Receipt: {receipt_number} - Item: {receipt_list[1]} - Amount: {receipt_list[2]}"
-            search_list.append(item_text)
+            search_list.append(item_text)   #add receipt list to receipt display listbox
         
             
         
-        for search in search_list:
-            if typed == "":
+        for search in search_list:  #seeing if user search matches anything in receipt list
+            if typed == "":     #if user has typed nothing then display all receipts in listbox 
                 self.receipt_storage.insert(END, search)
-            elif typed.lower() in search.lower():
+            elif typed.lower() in search.lower():   # if user has typed something and it matches something in a receipt, display it in listbox
                 self.receipt_storage.insert(END, search)
-        if not self.receipt_storage.get(0):
+        if not self.receipt_storage.get(0): #if user search doesnt match anything, tell user there are no search results
             print('no')
             self.receipt_storage.insert(END, "No Search Results")
 
         
         
 
-    def name_and_item_search(self, search_field, index):
+    def name_and_item_search(self, search_field, index):    #function for name search and item search
         
-        for receipt_number, receipt_list in MainWindow.receipt_dict.items():
+        for receipt_number, receipt_list in MainWindow.receipt_dict.items(): #get the receipt number (key), and receipt list (value of key)
             print (receipt_list, '-receipt list')
-            if receipt_list[index] == search_field:
+            if receipt_list[index] == search_field: #if user search matches name/item (index value determines what function is searching for)
                 
                 
                 MainWindow.index = MainWindow.receipt_list.index(receipt_number)
