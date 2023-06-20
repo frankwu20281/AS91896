@@ -207,15 +207,11 @@ class MainWindow:
     def double_click (self, event):
         selected_receipt = self.receipt_storage.get(self.receipt_storage.curselection())
         
-        
-       
         receipt_number = selected_receipt[selected_receipt.find("Receipt")+9: selected_receipt.find("Item")-3].strip()
         print (selected_receipt)
         
         self.receipt_shifting(int(receipt_number))
-
-       
-        self.search_window_active = False
+        
         #master.destroy()
     
     def receipt_shifting (self,receipt_number):
@@ -252,7 +248,9 @@ class MainWindow:
             MainWindow.receipt_dict.pop(receipt_number)
             MainWindow.receipt_list.remove(receipt_number)
             MainWindow.page_amount -= 1 
-            MainWindow.index -= 1 
+            print (MainWindow.index)
+            if MainWindow.index == MainWindow.page_amount:
+                MainWindow.index -= 1 
             
             if MainWindow.page_amount == 0: 
                 self.receipt_image.config(text= f"No receipts\n\n\n\n")
