@@ -1,5 +1,6 @@
 from tkinter import * 
 from tkinter import messagebox
+from tkinter import ttk
 from random import randint
 
 class MainWindow: 
@@ -9,14 +10,28 @@ class MainWindow:
     index = -1          #counter to keep count what receipt in the list the program currently is displaying/using, start at -1 because 0 is the item in list
     page_amount = 0     #keep count of the total amount of receipts in the program 
     def __init__(self, master):
-    
         #config the program window
         self.master = master 
         root.title("Receipts")
         root.geometry("700x300")
+        style = ttk.Style(root)
+        style.theme_use("xpnative")
+        style.configure(root, font = ("Arial", 12))
+
+        self.bold_font = ('Arial', 20, 'bold')
+        self.bold_colour = "black"
+
+        self.default_font = ('Arial', 12)
+        self.default_colour = "black"
+
+        self.secondary = "SystemButtonFace"
+        self.primary = "#fbfbfb"
+
+        root.config(bg= self.primary)
 
         self.search_window_active = False
         self.theme_colour ='SystemButtonFace'
+        
 
         #creating menu bar
         menubar = Menu(master)
@@ -28,79 +43,92 @@ class MainWindow:
         
         
         themes_submenu = Menu(tool_menu, tearoff= 0)
-        themes_submenu.add_command(label= "Light" ,command= lambda :self.themes("SystemButtonFace")) #SystemButtonFace for default colour
+        themes_submenu.add_command(label= "Light" ,command= lambda :self.themes("Light")) #SystemButtonFace for default colour
     
-        themes_submenu.add_command(label= "Dark" ,command= lambda :self.themes("Black"))
+        themes_submenu.add_command(label= "Dark" ,command= lambda :self.themes("Dark"))
         tool_menu.add_cascade(label="Themes", menu= themes_submenu)
         
         tool_menu.add_separator()
         tool_menu.add_command(label= "Exit", command= self.quit)
         
         #creating 'master' frame to put all ui stuff in
-        frame = Frame(root)
-        frame.pack( )
+        ttk.Label(root,text='Store', font=self.bold_font).pack( anchor=N)
+        frame = ttk.Frame(root)
+        frame.pack()
 
-        Label(root,text='Store').pack( anchor=N)
+        
         
         #frame with all the user entry stuff 
-        EntryFrame=LabelFrame(frame, text= "fill out")
-        EntryFrame.pack(side= LEFT, fill= BOTH) 
+        self.EntryFrame=ttk.LabelFrame(frame, text= "fill out")
+        self.EntryFrame.pack(side= LEFT, fill= BOTH) 
 
-        self.name_label = Label(EntryFrame, text= "enter full name")
+        self.name_label = ttk.Label(self.EntryFrame, text= "enter full name", font=self.default_font)
         self.name_label.grid(row=0, column=0)
-        self.name_entry = Entry(EntryFrame)
+        self.name_entry = ttk.Entry(self.EntryFrame, font=self.default_font)
         self.name_entry.grid(row=0, column=1)
 
-        self.item_label = Label(EntryFrame, text= "enter item name")
+        self.item_label = ttk.Label(self.EntryFrame, text= "enter item name", font=self.default_font)
         self.item_label.grid(row=1, column= 0)
-        self.item_entry = Entry(EntryFrame)
+        self.item_entry = ttk.Entry(self.EntryFrame, font=self.default_font)
         self.item_entry.grid(row=1, column=1)
 
-        self.amount_label = Label(EntryFrame, text= "enter item amount")
+        self.amount_label = ttk.Label(self.EntryFrame, text= "enter item amount", font=self.default_font)
         self.amount_label.grid(row=2, column= 0)
-        self.amount_entry = Spinbox(EntryFrame, from_ = 1,to = 500)
+        self.amount_entry = ttk.Spinbox(self.EntryFrame, from_ = 1,to = 500, font=self.default_font)
         self.amount_entry. grid (row=2, column=1)
 
-        Button(EntryFrame, text= "Buy", command= lambda : self.add(self.name_entry.get().strip().lower(),self.item_entry.get().strip().lower()
+        ttk.Button(self.EntryFrame, text= "Buy", command= lambda : self.add(self.name_entry.get().strip().lower(),self.item_entry.get().strip().lower()
                 , self.amount_entry.get().strip().lower())).grid(row=3, column=0)
         
         
-        Button(EntryFrame, text = "Return", command = self.delete).grid(row=3,column=1)
+        ttk.Button(self.EntryFrame, text = "Return", command = self.delete).grid(row=3,column=1)
 
         # frame with the receipt search bar 
-        SearchFrame = LabelFrame(frame, text= "Receipt Search")
+        SearchFrame = LabelFrame(frame, text= "Receipt Search", font=self.default_font)
         SearchFrame.pack(fill= X)
 
         
-        self.search_entry = Entry(SearchFrame)
+        self.search_entry = ttk.Entry(SearchFrame)
         self.search_entry.bind("<KeyRelease>", (lambda event: self.receipt_search(self.search_entry.get(), False)))
         self.search_entry.pack(side= LEFT, fill= X, expand= True)
         
-        Button(SearchFrame, text= "Advanced Search Menu", command= self.search_window).pack(side= LEFT)
+        ttk.Button(SearchFrame, text= "Advanced Search Menu", command= self.search_window).pack(side= LEFT)
 
         
         #frame with the receipt display stuff 
-        DisplayFrame=LabelFrame(frame, text= "Receipt")
+        DisplayFrame=LabelFrame(frame, text= "Receipt", font=self.default_font)
         DisplayFrame.pack( fill=  BOTH, expand= TRUE)
 
-        self.receipt_image = Label(DisplayFrame, text="No receipts\n\n\n\n")
+        self.receipt_image = ttk.Label(DisplayFrame, text="No receipts\n\n\n\n", font=self.default_font)
         self.receipt_image.pack(fill= X)
 
-        self.back = Button(DisplayFrame, text="<-", command= self.previous_receipt, state= DISABLED)
+        self.back = Button(DisplayFrame, text="<-", command= self.previous_receipt, state= DISABLED, font=self.default_font)
         self.back.pack(side= LEFT)
 
-        self.page_number = Label(DisplayFrame, text= f"{MainWindow.index+1} of {MainWindow.page_amount}")
+        self.page_number = ttk.Label(DisplayFrame, text= f"{MainWindow.index+1} of {MainWindow.page_amount}", font=self.default_font)
         self.page_number.pack(side= LEFT,fill= BOTH, expand= True)
         
-        self.forward = Button(DisplayFrame, text= "->", command= self.next_receipt, state= DISABLED)
+        self.forward = Button(DisplayFrame, text= "->", command= self.next_receipt, state= DISABLED, font=self.default_font)
         self.forward.pack(side= LEFT)
         
         
     def themes (self, colour ): #function to control colour theme of the whole program
 
-        root.config(bg= colour)
-        self.theme_colour = colour 
+        if colour == "Dark":
+            print('sdaf')
+            self.secondary = "#121212"
+            self.primary = "#323232"
+            self.EntryFrame.config(bg= self.primary)
+            root.config(bg = self.secondary)
+            ttk.Style(root).configure(root, font =  ("Arial", 12)) 
+        else:
+           
+
             
+
+            self.secondary = "SystemButtonFace"
+            self.primary = "#fbfbfb"
+        root.update_idletasks()
   
     def search_window (self):   #function to initiate advanced search window 
         #window config stuff
@@ -129,8 +157,6 @@ class MainWindow:
         self.receipt_storage.pack(pady= 5, padx=5, fill= X, anchor= S)
     
     def search_choice(self, event): #check what search option user wants
-        
-        
         self.receipt_storage.delete(0, END)
         choice = self.dropdown.get()
     
