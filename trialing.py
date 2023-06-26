@@ -14,9 +14,13 @@ class MainWindow:
         self.master = master 
         root.title("Receipts")
         root.geometry("700x300")
-        style = ttk.Style(root)
-        style.theme_use("xpnative")
-        style.configure(root, font = ("Arial", 12))
+        self.style = ttk.Style(root)
+        self.style.theme_use("xpnative")
+        self.style.configure(root, font = ("Arial", 12))
+        self.style.configure('big.TButton', font = (None, 12), foreground = "Black")
+        self.style.configure("main.TFrame", font = (None, 12) , background = "#fbfbfb" )
+        self.style.configure("sub.TFrame", font = (None, 12) , background = "SystemButtonFace" )
+
 
         self.bold_font = ('Arial', 20, 'bold')
         self.bold_colour = "black"
@@ -27,7 +31,7 @@ class MainWindow:
         self.secondary = "SystemButtonFace"
         self.primary = "#fbfbfb"
 
-        root.config(bg= self.primary)
+        root.config(bg= 'white')
 
         self.search_window_active = False
         self.theme_colour ='SystemButtonFace'
@@ -52,14 +56,14 @@ class MainWindow:
         tool_menu.add_command(label= "Exit", command= self.quit)
         
         #creating 'master' frame to put all ui stuff in
-        ttk.Label(root,text='Store', font=self.bold_font).pack( anchor=N)
-        frame = ttk.Frame(root)
+        
+        frame = ttk.Frame(root, style= "main.TFrame")
         frame.pack()
 
         
         
         #frame with all the user entry stuff 
-        self.EntryFrame=ttk.LabelFrame(frame, text= "fill out")
+        self.EntryFrame=ttk.LabelFrame(frame, text= "fill out", style= "sub.TFrame", relief= "groove")
         self.EntryFrame.pack(side= LEFT, fill= BOTH) 
 
         self.name_label = ttk.Label(self.EntryFrame, text= "enter full name", font=self.default_font)
@@ -78,7 +82,7 @@ class MainWindow:
         self.amount_entry. grid (row=2, column=1)
 
         ttk.Button(self.EntryFrame, text= "Buy", command= lambda : self.add(self.name_entry.get().strip().lower(),self.item_entry.get().strip().lower()
-                , self.amount_entry.get().strip().lower())).grid(row=3, column=0)
+                , self.amount_entry.get().strip().lower()), style= "big.TButton").grid(row=3, column=0)
         
         
         ttk.Button(self.EntryFrame, text = "Return", command = self.delete).grid(row=3,column=1)
@@ -120,7 +124,8 @@ class MainWindow:
             self.primary = "#323232"
             self.EntryFrame.config(bg= self.primary)
             root.config(bg = self.secondary)
-            ttk.Style(root).configure(root, font =  ("Arial", 12)) 
+            ttk.Style(root).configure(root, font =  ("Arial", 12))
+            ttk.Style(root).configure('big.TButton', font = (None, 12), foreground = "White") 
         else:
            
 
