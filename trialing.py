@@ -14,27 +14,21 @@ class MainWindow:
         self.master = master 
         root.title("Receipts")
         root.geometry("700x300")
+        root.configure(bg= "red")
         self.style = ttk.Style(root)
         self.style.theme_use("xpnative")
-        self.style.configure(root, font = ("Arial", 12))
-        self.style.configure('big.TButton', font = (None, 12), foreground = "Black")
+
+        self.style.configure(root, font = ("Arial", 12), background = 'SystemButtonFace', foreground = "black")
+        self.style.configure("heading.TLabel", font = ("Arial", 20, "bold"))
+
         self.style.configure("main.TFrame", font = (None, 12) , background = "#fbfbfb" )
         self.style.configure("sub.TFrame", font = (None, 12) , background = "SystemButtonFace" )
 
+        self.style.configure('big.TButton', font = (None, 12), foreground = "Black")      
+        self.style.configure("TSpinbox", font = ("Arial", 20))
 
-        self.bold_font = ('Arial', 20, 'bold')
-        self.bold_colour = "black"
-
-        self.default_font = ('Arial', 12)
-        self.default_colour = "black"
-
-        self.secondary = "SystemButtonFace"
-        self.primary = "#fbfbfb"
-
-        root.config(bg= 'white')
-
-        self.search_window_active = False
-        self.theme_colour ='SystemButtonFace'
+        ipadding = {'ipadx':20, 'ipady': 20}
+        padding = {'padx':10, 'pady': 10}
         
 
         #creating menu bar
@@ -58,27 +52,27 @@ class MainWindow:
         #creating 'master' frame to put all ui stuff in
         
         frame = ttk.Frame(root, style= "main.TFrame")
-        frame.pack()
+        frame.pack(pady=10)
 
         
         
         #frame with all the user entry stuff 
-        self.EntryFrame=ttk.LabelFrame(frame, text= "fill out", style= "sub.TFrame", relief= "groove")
-        self.EntryFrame.pack(side= LEFT, fill= BOTH) 
+        self.EntryFrame=ttk.LabelFrame(frame, text= "fill out", style= "sub.TFrame")
+        self.EntryFrame.pack(side= LEFT, fill= BOTH, padx= 10, pady= 10) 
 
-        self.name_label = ttk.Label(self.EntryFrame, text= "enter full name", font=self.default_font)
+        self.name_label = ttk.Label(self.EntryFrame, text= "enter full name")
         self.name_label.grid(row=0, column=0)
-        self.name_entry = ttk.Entry(self.EntryFrame, font=self.default_font)
+        self.name_entry = ttk.Entry(self.EntryFrame)
         self.name_entry.grid(row=0, column=1)
 
-        self.item_label = ttk.Label(self.EntryFrame, text= "enter item name", font=self.default_font)
+        self.item_label = ttk.Label(self.EntryFrame, text= "enter item name")
         self.item_label.grid(row=1, column= 0)
-        self.item_entry = ttk.Entry(self.EntryFrame, font=self.default_font)
+        self.item_entry = ttk.Entry(self.EntryFrame)
         self.item_entry.grid(row=1, column=1)
 
-        self.amount_label = ttk.Label(self.EntryFrame, text= "enter item amount", font=self.default_font)
-        self.amount_label.grid(row=2, column= 0)
-        self.amount_entry = ttk.Spinbox(self.EntryFrame, from_ = 1,to = 500, font=self.default_font)
+        self.amount_label = ttk.Label(self.EntryFrame, text= "enter item amount")
+        self.amount_label.grid(row=2, column= 0)    
+        self.amount_entry = ttk.Spinbox(self.EntryFrame, from_ = 1,to = 500, style= "TSpinbox")
         self.amount_entry. grid (row=2, column=1)
 
         ttk.Button(self.EntryFrame, text= "Buy", command= lambda : self.add(self.name_entry.get().strip().lower(),self.item_entry.get().strip().lower()
@@ -88,8 +82,8 @@ class MainWindow:
         ttk.Button(self.EntryFrame, text = "Return", command = self.delete).grid(row=3,column=1)
 
         # frame with the receipt search bar 
-        SearchFrame = LabelFrame(frame, text= "Receipt Search", font=self.default_font)
-        SearchFrame.pack(fill= X)
+        SearchFrame = ttk.LabelFrame(frame, text= "Receipt Search", style= "sub.TFrame")
+        SearchFrame.pack(fill= X ,padx= 10, pady=10)
 
         
         self.search_entry = ttk.Entry(SearchFrame)
@@ -100,48 +94,56 @@ class MainWindow:
 
         
         #frame with the receipt display stuff 
-        DisplayFrame=LabelFrame(frame, text= "Receipt", font=self.default_font)
-        DisplayFrame.pack( fill=  BOTH, expand= TRUE)
+        DisplayFrame=ttk.LabelFrame(frame, text= "Receipt", style= "sub.TFrame")
+        DisplayFrame.pack(**padding, expand=TRUE,fill = BOTH)
 
-        self.receipt_image = ttk.Label(DisplayFrame, text="No receipts\n\n\n\n", font=self.default_font)
-        self.receipt_image.pack(fill= X)
+        self.receipt_image = ttk.Label(DisplayFrame, text="No receipts\n\n\n\n")
+        self.receipt_image.pack( anchor= CENTER,expand= TRUE)
 
-        self.back = Button(DisplayFrame, text="<-", command= self.previous_receipt, state= DISABLED, font=self.default_font)
-        self.back.pack(side= LEFT)
+        self.back = Button(DisplayFrame, text="<-", command= self.previous_receipt, state= DISABLED)
+        self.back.pack(side= LEFT, fill = BOTH, expand= TRUE)
 
-        self.page_number = ttk.Label(DisplayFrame, text= f"{MainWindow.index+1} of {MainWindow.page_amount}", font=self.default_font)
-        self.page_number.pack(side= LEFT,fill= BOTH, expand= True)
+        self.page_number = ttk.Label(DisplayFrame, text= f"{MainWindow.index+1} of {MainWindow.page_amount}")
+        self.page_number.pack(side= LEFT, expand= TRUE, anchor= CENTER)
         
-        self.forward = Button(DisplayFrame, text= "->", command= self.next_receipt, state= DISABLED, font=self.default_font)
-        self.forward.pack(side= LEFT)
+        self.forward = Button(DisplayFrame, text= "->", command= self.next_receipt, state= DISABLED)
+        self.forward.pack(side= LEFT, fill = BOTH, expand= TRUE)
         
+        #self.forward.pack(side= LEFT, expand= TRUE ,anchor= CENTER)
         
     def themes (self, colour ): #function to control colour theme of the whole program
 
         if colour == "Dark":
             print('sdaf')
-            self.secondary = "#121212"
-            self.primary = "#323232"
-            self.EntryFrame.config(bg= self.primary)
-            root.config(bg = self.secondary)
-            ttk.Style(root).configure(root, font =  ("Arial", 12))
-            ttk.Style(root).configure('big.TButton', font = (None, 12), foreground = "White") 
-        else:
-           
+            self.style.configure(root, font = ("Arial", 12), foreground = "white",background = "#121212" )
+            self.style.configure("heading.TLabel", font = ("Arial", 20, "bold") )
 
+            self.style.configure("main.TFrame", font = (None, 12) , background = "#323232" )
+            self.style.configure("sub.TFrame", font = (None, 12) , background = "#121212" )
+
+            self.style.configure('big.TButton', font = (None, 12), foreground = "Black")
+            self.style.configure("TSpinbox", font = ("Arial", 20))
+                
             
+        else:
 
-            self.secondary = "SystemButtonFace"
-            self.primary = "#fbfbfb"
-        root.update_idletasks()
+            self.style.configure(root, font = ("Arial", 12), background = 'SystemButtonFace', foreground = "black")
+            self.style.configure("heading.TLabel", font = ("Arial", 20, "bold"))
+
+            self.style.configure("main.TFrame", font = (None, 12) , background = "#fbfbfb" )
+            self.style.configure("sub.TFrame", font = (None, 12) , background = "SystemButtonFace" )
+
+            self.style.configure('big.TButton', font = (None, 12), foreground = "Black")      
+            self.style.configure("TSpinbox", font = ("Arial", 20))
+    
   
     def search_window (self):   #function to initiate advanced search window 
         #window config stuff
-        self.search_window_active = True
+        
         SearchWindow = Toplevel(root)
         SearchWindow.title('Advanced Search')
         
-        SearchWindow.config(bg= self.theme_colour)
+        
         
         Label(SearchWindow, text='Advanced Search').pack()
         self.dropdown= StringVar()
