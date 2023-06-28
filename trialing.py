@@ -13,7 +13,7 @@ class MainWindow:
         #config the program window
         self.master = master 
         root.title("Receipts")
-        root.geometry("700x300")
+        root.geometry("700x350")
         root.configure(bg= "red")
         self.style = ttk.Style(root)
         self.style.theme_use("xpnative")
@@ -24,7 +24,7 @@ class MainWindow:
         self.style.configure("main.TFrame", font = (None, 12) , background = "#fbfbfb" )
         self.style.configure("sub.TFrame", font = (None, 12) , background = "SystemButtonFace" )
 
-        self.style.configure('big.TButton', font = (None, 12), foreground = "Black")      
+        self.style.configure('TButton', font = (None, 12), foreground = "Black")      
         self.style.configure("TSpinbox", font = ("Arial", 20))
 
         ipadding = {'ipadx':20, 'ipady': 20}
@@ -52,34 +52,34 @@ class MainWindow:
         #creating 'master' frame to put all ui stuff in
         
         frame = ttk.Frame(root, style= "main.TFrame")
-        frame.pack(pady=10)
+        frame.pack(pady=40, padx= 40, **ipadding)
 
         
         
         #frame with all the user entry stuff 
         self.EntryFrame=ttk.LabelFrame(frame, text= "fill out", style= "sub.TFrame")
-        self.EntryFrame.pack(side= LEFT, fill= BOTH, padx= 10, pady= 10) 
+        self.EntryFrame.pack(side= LEFT, fill= BOTH, padx= 10, pady= 10 ) 
 
         self.name_label = ttk.Label(self.EntryFrame, text= "enter full name")
-        self.name_label.grid(row=0, column=0)
+        self.name_label.grid(row=0, column=0, pady= 5, padx= 5)
         self.name_entry = ttk.Entry(self.EntryFrame)
-        self.name_entry.grid(row=0, column=1)
+        self.name_entry.grid(row=0, column=1, pady= 5, padx= 5)
 
         self.item_label = ttk.Label(self.EntryFrame, text= "enter item name")
-        self.item_label.grid(row=1, column= 0)
+        self.item_label.grid(row=1, column= 0, pady= 5, padx= 5)
         self.item_entry = ttk.Entry(self.EntryFrame)
-        self.item_entry.grid(row=1, column=1)
+        self.item_entry.grid(row=1, column=1, pady= 5, padx= 5)
 
         self.amount_label = ttk.Label(self.EntryFrame, text= "enter item amount")
-        self.amount_label.grid(row=2, column= 0)    
-        self.amount_entry = ttk.Spinbox(self.EntryFrame, from_ = 1,to = 500, style= "TSpinbox")
-        self.amount_entry. grid (row=2, column=1)
+        self.amount_label.grid(row=2, column= 0, pady= 5, padx= 5)    
+        self.amount_entry = ttk.Entry(self.EntryFrame)
+        self.amount_entry. grid (row=2, column=1, pady= 5, padx= 5)
 
         ttk.Button(self.EntryFrame, text= "Buy", command= lambda : self.add(self.name_entry.get().strip().lower(),self.item_entry.get().strip().lower()
-                , self.amount_entry.get().strip().lower()), style= "big.TButton").grid(row=3, column=0)
+                , self.amount_entry.get().strip().lower()), style= "big.TButton").grid(row=3, column=0, pady= 5)
         
         
-        ttk.Button(self.EntryFrame, text = "Return", command = self.delete).grid(row=3,column=1)
+        ttk.Button(self.EntryFrame, text = "Return", command = self.delete).grid(row=3,column=1, pady= 5)
 
         # frame with the receipt search bar 
         SearchFrame = ttk.LabelFrame(frame, text= "Receipt Search", style= "sub.TFrame")
@@ -90,8 +90,8 @@ class MainWindow:
         self.search_entry.bind("<KeyRelease>", (lambda event: self.receipt_search(self.search_entry.get(), False)))
         self.search_entry.pack(side= LEFT, fill= X, expand= True)
         
-        ttk.Button(SearchFrame, text= "Advanced Search Menu", command= self.search_window).pack(side= LEFT)
-
+        ttk.Button(SearchFrame, text= "Advanced Search", command= self.search_window).pack(side= LEFT)
+   
         
         #frame with the receipt display stuff 
         DisplayFrame=ttk.LabelFrame(frame, text= "Receipt", style= "sub.TFrame")
@@ -100,21 +100,22 @@ class MainWindow:
         self.receipt_image = ttk.Label(DisplayFrame, text="No receipts\n\n\n\n")
         self.receipt_image.pack( anchor= CENTER,expand= TRUE)
 
-        self.back = Button(DisplayFrame, text="<-", command= self.previous_receipt, state= DISABLED)
-        self.back.pack(side= LEFT, fill = BOTH, expand= TRUE)
+        self.back = ttk.Button(DisplayFrame, text="←", command= self.previous_receipt, state= DISABLED)
+        self.back.pack( side= LEFT, expand= TRUE ,anchor= CENTER, pady=10)
 
         self.page_number = ttk.Label(DisplayFrame, text= f"{MainWindow.index+1} of {MainWindow.page_amount}")
-        self.page_number.pack(side= LEFT, expand= TRUE, anchor= CENTER)
+        self.page_number.pack(side= LEFT, expand= TRUE,  anchor= CENTER)
         
-        self.forward = Button(DisplayFrame, text= "->", command= self.next_receipt, state= DISABLED)
-        self.forward.pack(side= LEFT, fill = BOTH, expand= TRUE)
+        self.forward = ttk.Button(DisplayFrame, text= "→", command= self.next_receipt, state= DISABLED, style="TButton")
+        self.forward.pack( side= LEFT, expand= TRUE ,anchor= CENTER, pady=10)
+        
         
         #self.forward.pack(side= LEFT, expand= TRUE ,anchor= CENTER)
         
     def themes (self, colour ): #function to control colour theme of the whole program
 
         if colour == "Dark":
-            print('sdaf')
+            print('dark mode')
             self.style.configure(root, font = ("Arial", 12), foreground = "white",background = "#121212" )
             self.style.configure("heading.TLabel", font = ("Arial", 20, "bold") )
 
@@ -126,7 +127,7 @@ class MainWindow:
                 
             
         else:
-
+            print ("light mode")
             self.style.configure(root, font = ("Arial", 12), background = 'SystemButtonFace', foreground = "black")
             self.style.configure("heading.TLabel", font = ("Arial", 20, "bold"))
 
@@ -257,7 +258,7 @@ class MainWindow:
         print(receipt_list, "receipt list", MainWindow.index, " index")
         print (MainWindow.receipt_dict, "whole dict")
 
-        self.receipt_image.config(text= f"Store \nName: {receipt_list[0]}\n Reciept: {receipt_number}\n Item: {receipt_list[1]}\n Amount:{receipt_list[2]}")
+        self.receipt_image.config(text= f"Store \nName: {receipt_list[0]}\nReciept: {receipt_number}\nItem: {receipt_list[1]}\nAmount: {receipt_list[2]}")
         if MainWindow.page_amount == 1 and MainWindow.index ==0 : 
             self.forward.config(state= DISABLED)
             self.back.config(state= DISABLED)
