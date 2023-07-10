@@ -18,7 +18,7 @@ class MainWindow:
         self.style = ttk.Style(root)
         self.style.theme_use("xpnative")
         
-        self.mode = "light"
+        self.mode = "Light"
         self.style.configure(root, font = ("Arial", 12), background = 'SystemButtonFace', foreground = "black")
         self.style.configure("heading.TLabel", font = ("Arial", 20, "bold"))
 
@@ -114,36 +114,26 @@ class MainWindow:
         
         #self.forward.pack(side= LEFT, expand= TRUE ,anchor= CENTER)
         
-    def themes (self, colour ): #function to control colour theme of the whole program
+    def themes (self, mode ): #function to control colour theme of the whole program
 
-        if colour == "Dark":
-            print('dark mode')
-            self.mode= "dark"
-            root.configure(bg= "#2b2b2b")
-            self.style.configure(root, font = ("Arial", 12), foreground = "white",background = "#262626" )
-            self.style.configure("heading.TLabel", font = ("Arial", 20, "bold") )
+        
+        print(self.mode)
+        self.mode  = mode
+        
+        root.configure(bg= "#2b2b2b")
+        self.style.configure(root, font = ("Arial", 12), foreground = "white" if mode == "Dark" else 'black' 
+                            ,background = "#262626" if mode == 'Dark' else "SystemButtonFace")
+        self.style.configure("heading.TLabel", font = ("Arial", 20, "bold") )
 
-            self.style.configure("main.TFrame", font = (None, 12) , background = "#323232" )
-            self.style.configure("sub.TFrame", font = (None, 12) , background = "#262626" )
+        self.style.configure("main.TFrame", font = (None, 12) , background = "#323232" if mode == 'Dark' else "#fbfbfb")
+        self.style.configure("sub.TFrame", font = (None, 12) , background = "#262626" if mode == 'Dark' else"SystemButtonFace"  )
 
-            self.style.configure('TButton', font = (None, 12), foreground = "#262626")
-            self.style.configure("TSpinbox", font = ("Arial", 20))
-            self.style.configure('TEntry', foreground = "Black")
+        self.style.configure('TButton', font = (None, 12), foreground = "#262626"if mode == 'Dark' else "Black")
+        self.style.configure("TSpinbox", font = ("Arial", 20))
+        self.style.configure('TEntry', foreground = "Black")
                 
             
-        else:
-            print ("light mode")
-            self.mode = "light"
-            root.configure(bg= "SystemButtonFace")
-            self.style.configure(root, font = ("Arial", 12), background = 'SystemButtonFace', foreground = "black")
-            self.style.configure("heading.TLabel", font = ("Arial", 20, "bold"))
-
-            self.style.configure("main.TFrame", font = (None, 12) , background = "#fbfbfb" )
-            self.style.configure("sub.TFrame", font = (None, 12) , background = "SystemButtonFace" )
-
-            self.style.configure('TButton', font = (None, 12), foreground = "Black")      
-            self.style.configure("TSpinbox", font = ("Arial", 20))
-            self.style.configure('TEntry', foreground = "Black")
+        
     
   
     def search_window (self):   #function to initiate advanced search window 
@@ -151,14 +141,14 @@ class MainWindow:
         
         SearchWindow = Toplevel(root)
         SearchWindow.title('Advanced Search')
-        SearchWindow.configure(bg= "SystemButtonFace" if self.mode == "light" else "#2b2b2b" )
+        SearchWindow.configure(bg= "SystemButtonFace" if self.mode == "Light" else "#2b2b2b" )
         style = ttk.Style(SearchWindow)
         style.theme_use("xpnative")
         
         
         
-        Label(SearchWindow, text='Advanced Search', foreground= "black" if self.mode == "light" else "white", 
-              background="SystemButtonFace" if self.mode == "light" else "#2b2b2b" ).pack()
+        Label(SearchWindow, text='Advanced Search', foreground= "black" if self.mode == "Light" else "white", 
+              background="SystemButtonFace" if self.mode == "Light" else "#2b2b2b" ).pack()
         
         #dropdown menu for user to choose what search option they want
         
@@ -175,8 +165,8 @@ class MainWindow:
         adv_search_entry.bind ("<KeyRelease>", lambda event: self.search_choice(dropdown_menu.get(), adv_search_entry.get().strip()))
         adv_search_entry.pack(padx= 5, fill= X)
         #listbox to show users search results, when user double clicks on option it displays it on main window
-        self.receipt_storage = Listbox(SearchWindow, width= 50, background= "SystemButtonFace" if self.mode == "light" else "#2b2b2b", 
-                                       foreground= "black" if self.mode == "light" else "white")
+        self.receipt_storage = Listbox(SearchWindow, width= 50, background= "SystemButtonFace" if self.mode == "Light" else "#2b2b2b", 
+                                       foreground= "black" if self.mode == "Light" else "white")
         self.receipt_storage.bind('<Double-Button>', (lambda event: self.double_click(self)))
         #self.search_entry.bind("<Return>", (lambda event: self.adv_search(self)))
         self.receipt_storage.pack(pady= 5, padx=5, fill= BOTH, expand= TRUE, side= LEFT)
@@ -199,20 +189,14 @@ class MainWindow:
             case "Search All":
                 self.all_search(search)
        
-    def all_search(self, typed):   #search all function for the advanced search window 
-       
+    def all_search(self, typed):   #search all function for the advanced search window    
         print('allsearchstart')
-        search_list =[]
-       
-        
+        search_list =[] 
         for receipt_number, receipt_list in self.receipt_dict.items(): #get the receipt number (key), and receipt list (value of key)
             
             print(receipt_list, "- receipt list")
             item_text = f"Name: {receipt_list[0]} - Receipt: {receipt_number} - Item: {receipt_list[1]} - Amount: {receipt_list[2]}"
             search_list.append(item_text)   #add receipt list to receipt display listbox
-        
-            
-        
         for search in search_list:  #seeing if user search matches anything in receipt list
             if typed == "":     #if user has typed nothing then display all receipts in listbox 
                 self.receipt_storage.insert(END, search)
@@ -348,10 +332,6 @@ class MainWindow:
     
     def quit (self):
         root.destroy()
-
-    
-       
-
 root = Tk()   
 program = MainWindow(root)
 
