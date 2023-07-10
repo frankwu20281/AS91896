@@ -4,20 +4,21 @@ from tkinter import ttk
 from random import randint
 
 class MainWindow: 
-    
-    receipt_list = []   #list to store receipt
-    receipt_dict ={}    #dictionary to store receipt data using receipt number as key 
-    index = -1          #counter to keep count what receipt in the list the program currently is displaying/using, start at -1 because 0 is the item in list
-    page_amount = 0     #keep count of the total amount of receipts in the program 
     def __init__(self, master):
+        self.receipt_list = []   #list to store receipt
+        self.receipt_dict ={}    #dictionary to store receipt data using receipt number as key 
+        self.index = -1          #counter to keep count what receipt in the list the program currently is displaying/using, start at -1 because 0 is the item in list
+        self.page_amount = 0     #keep count of the total amount of receipts in the program 
+        
         #config the program window
         self.master = master 
         root.title("Receipts")
-        root.geometry("700x350")
-        root.configure(bg= "red")
+        root.geometry("700x380")
+        root.configure(bg= "SystemButtonFace")
         self.style = ttk.Style(root)
         self.style.theme_use("xpnative")
-
+        
+        self.mode = "light"
         self.style.configure(root, font = ("Arial", 12), background = 'SystemButtonFace', foreground = "black")
         self.style.configure("heading.TLabel", font = ("Arial", 20, "bold"))
 
@@ -26,9 +27,10 @@ class MainWindow:
 
         self.style.configure('TButton', font = (None, 12), foreground = "Black")      
         self.style.configure("TSpinbox", font = ("Arial", 20))
+        self.style.configure('TEntry', foreground = "Black")
 
-        ipadding = {'ipadx':20, 'ipady': 20}
-        padding = {'padx':10, 'pady': 10}
+        ipadding = {'ipadx':40, 'ipady': 40}
+        padding = {'padx':15, 'pady': 15}
         
 
         #creating menu bar
@@ -52,13 +54,13 @@ class MainWindow:
         #creating 'master' frame to put all ui stuff in
         
         frame = ttk.Frame(root, style= "main.TFrame")
-        frame.pack(pady=40, padx= 40, **ipadding)
+        frame.pack(pady=40, padx= 40, expand= TRUE)
 
         
         
         #frame with all the user entry stuff 
         self.EntryFrame=ttk.LabelFrame(frame, text= "fill out", style= "sub.TFrame")
-        self.EntryFrame.pack(side= LEFT, fill= BOTH, padx= 10, pady= 10 ) 
+        self.EntryFrame.pack(side= LEFT, fill= BOTH, **padding) 
 
         self.name_label = ttk.Label(self.EntryFrame, text= "enter full name")
         self.name_label.grid(row=0, column=0, pady= 5, padx= 5)
@@ -83,12 +85,12 @@ class MainWindow:
 
         # frame with the receipt search bar 
         SearchFrame = ttk.LabelFrame(frame, text= "Receipt Search", style= "sub.TFrame")
-        SearchFrame.pack(fill= X ,padx= 10, pady=10)
+        SearchFrame.pack(fill= X ,**padding)
 
         
         self.search_entry = ttk.Entry(SearchFrame)
-        self.search_entry.bind("<KeyRelease>", (lambda event: self.receipt_search(self.search_entry.get(), False)))
-        self.search_entry.pack(side= LEFT, fill= X, expand= True)
+        self.search_entry.bind("<KeyRelease>", (lambda event: self.something(self.search_entry.get(),"Receipt", False)))
+        self.search_entry.pack(side= LEFT, expand= True, padx = 5)
         
         ttk.Button(SearchFrame, text= "Advanced Search", command= self.search_window).pack(side= LEFT)
    
@@ -100,13 +102,13 @@ class MainWindow:
         self.receipt_image = ttk.Label(DisplayFrame, text="No receipts\n\n\n\n")
         self.receipt_image.pack( anchor= CENTER,expand= TRUE)
 
-        self.back = ttk.Button(DisplayFrame, text="←", command= self.previous_receipt, state= DISABLED)
+        self.back = ttk.Button(DisplayFrame, text="←", command= lambda  :self.nav("left"), state= DISABLED)
         self.back.pack( side= LEFT, expand= TRUE ,anchor= CENTER, pady=10)
 
-        self.page_number = ttk.Label(DisplayFrame, text= f"{MainWindow.index+1} of {MainWindow.page_amount}")
+        self.page_number = ttk.Label(DisplayFrame, text= f"{self.index+1} of {self.page_amount}")
         self.page_number.pack(side= LEFT, expand= TRUE,  anchor= CENTER)
         
-        self.forward = ttk.Button(DisplayFrame, text= "→", command= self.next_receipt, state= DISABLED, style="TButton")
+        self.forward = ttk.Button(DisplayFrame, text= "→", command=lambda  : self.nav("right"), state= DISABLED)
         self.forward.pack( side= LEFT, expand= TRUE ,anchor= CENTER, pady=10)
         
         
@@ -116,26 +118,32 @@ class MainWindow:
 
         if colour == "Dark":
             print('dark mode')
-            self.style.configure(root, font = ("Arial", 12), foreground = "white",background = "#121212" )
+            self.mode= "dark"
+            root.configure(bg= "#2b2b2b")
+            self.style.configure(root, font = ("Arial", 12), foreground = "white",background = "#262626" )
             self.style.configure("heading.TLabel", font = ("Arial", 20, "bold") )
 
             self.style.configure("main.TFrame", font = (None, 12) , background = "#323232" )
-            self.style.configure("sub.TFrame", font = (None, 12) , background = "#121212" )
+            self.style.configure("sub.TFrame", font = (None, 12) , background = "#262626" )
 
-            self.style.configure('big.TButton', font = (None, 12), foreground = "Black")
+            self.style.configure('TButton', font = (None, 12), foreground = "#262626")
             self.style.configure("TSpinbox", font = ("Arial", 20))
+            self.style.configure('TEntry', foreground = "Black")
                 
             
         else:
             print ("light mode")
+            self.mode = "light"
+            root.configure(bg= "SystemButtonFace")
             self.style.configure(root, font = ("Arial", 12), background = 'SystemButtonFace', foreground = "black")
             self.style.configure("heading.TLabel", font = ("Arial", 20, "bold"))
 
             self.style.configure("main.TFrame", font = (None, 12) , background = "#fbfbfb" )
             self.style.configure("sub.TFrame", font = (None, 12) , background = "SystemButtonFace" )
 
-            self.style.configure('big.TButton', font = (None, 12), foreground = "Black")      
+            self.style.configure('TButton', font = (None, 12), foreground = "Black")      
             self.style.configure("TSpinbox", font = ("Arial", 20))
+            self.style.configure('TEntry', foreground = "Black")
     
   
     def search_window (self):   #function to initiate advanced search window 
@@ -143,48 +151,61 @@ class MainWindow:
         
         SearchWindow = Toplevel(root)
         SearchWindow.title('Advanced Search')
+        SearchWindow.configure(bg= "SystemButtonFace" if self.mode == "light" else "#2b2b2b" )
+        style = ttk.Style(SearchWindow)
+        style.theme_use("xpnative")
         
         
         
-        Label(SearchWindow, text='Advanced Search').pack()
-        self.dropdown= StringVar()
-        self.dropdown.set("Select Search type")
+        Label(SearchWindow, text='Advanced Search', foreground= "black" if self.mode == "light" else "white", 
+              background="SystemButtonFace" if self.mode == "light" else "#2b2b2b" ).pack()
         
         #dropdown menu for user to choose what search option they want
-        self.dropdown_menu= OptionMenu(SearchWindow, self.dropdown, "Receipt", "Name", "Item", "Search All", command= self.search_choice)
-        self.dropdown_menu.pack()
+        
+        
+        dropdown_menu= ttk.Combobox(SearchWindow,  values= ("Receipt", "Name", "Item", "Search All")
+                                         ,state = "readonly")
+        dropdown_menu.current(3)
+  
+        dropdown_menu.bind('<<ComboboxSelected>>', lambda event : self.search_choice(dropdown_menu.get(), adv_search_entry.get().strip()))
+        dropdown_menu.pack()
         
         #entry box for user to enter their search, binded to keyrelease so program will run search_choice function every time user stops typing  
-        self.adv_search_entry = Entry(SearchWindow)
-        self.adv_search_entry.bind ("<KeyRelease>", lambda event: self.search_choice(self))
-        self.adv_search_entry.pack(padx= 5, fill= X)
+        adv_search_entry = Entry(SearchWindow)
+        adv_search_entry.bind ("<KeyRelease>", lambda event: self.search_choice(dropdown_menu.get(), adv_search_entry.get().strip()))
+        adv_search_entry.pack(padx= 5, fill= X)
         #listbox to show users search results, when user double clicks on option it displays it on main window
-        self.receipt_storage = Listbox(SearchWindow, width= 50)
+        self.receipt_storage = Listbox(SearchWindow, width= 50, background= "SystemButtonFace" if self.mode == "light" else "#2b2b2b", 
+                                       foreground= "black" if self.mode == "light" else "white")
         self.receipt_storage.bind('<Double-Button>', (lambda event: self.double_click(self)))
         #self.search_entry.bind("<Return>", (lambda event: self.adv_search(self)))
-        self.receipt_storage.pack(pady= 5, padx=5, fill= X, anchor= S)
+        self.receipt_storage.pack(pady= 5, padx=5, fill= BOTH, expand= TRUE, side= LEFT)
+        
+        scrollbar= ttk.Scrollbar(SearchWindow, orient= 'vertical')
+        scrollbar.pack(side= LEFT, fill= Y)
+        self.receipt_storage.config(yscrollcommand= scrollbar.set)
+        scrollbar.config(command= self.receipt_storage.yview)
+        self.all_search(adv_search_entry.get().strip())
     
-    def search_choice(self, event): #check what search option user wants
+    def search_choice(self, choice, search): #check what search option user wants
         self.receipt_storage.delete(0, END)
-        choice = self.dropdown.get()
-    
-        if choice == "Name":
-            self.name_and_item_search(self.adv_search_entry.get().strip(),  0 )
-        elif choice =="Receipt":
-            MainWindow.receipt_search(self, self.adv_search_entry.get(), TRUE) 
-        elif choice == "Item":
-            MainWindow.name_and_item_search(self,self.adv_search_entry.get().strip(), 1)
-        elif choice == "Search All":
-            
-            MainWindow.all_search(self)
-
-    def all_search(self):   #search all function for the advanced search window 
+        match choice: 
+            case "Name":
+                self.something(search,  0, True )
+            case "Receipt":
+                self.something( search, "Receipt", True) 
+            case "Item":
+                self.something(search, 1, True)
+            case "Search All":
+                self.all_search(search)
+       
+    def all_search(self, typed):   #search all function for the advanced search window 
        
         print('allsearchstart')
         search_list =[]
-        typed = self.adv_search_entry.get() #see what user has typed
+       
         
-        for receipt_number, receipt_list in MainWindow.receipt_dict.items(): #get the receipt number (key), and receipt list (value of key)
+        for receipt_number, receipt_list in self.receipt_dict.items(): #get the receipt number (key), and receipt list (value of key)
             
             print(receipt_list, "- receipt list")
             item_text = f"Name: {receipt_list[0]} - Receipt: {receipt_number} - Item: {receipt_list[1]} - Amount: {receipt_list[2]}"
@@ -200,44 +221,31 @@ class MainWindow:
         if not self.receipt_storage.get(0): #if user search doesnt match anything, tell user there are no search results
             print('no')
             self.receipt_storage.insert(END, "No Search Results")
-
-        
-        
-
-    def name_and_item_search(self, search_field, index):    #function for name search and item search
-        
-        for receipt_number, receipt_list in MainWindow.receipt_dict.items(): #get the receipt number (key), and receipt list (value of key)
+            
+            
+            
+    def something (self, search_field, search_type, active ):
+        for receipt_number, receipt_list in self.receipt_dict.items(): #get the receipt number (key), and receipt list (value of key)
             print (receipt_list, '-receipt list')
-            if receipt_list[index] == search_field: #if user search matches name/item (index value determines what function is searching for)
-                
-                
-                MainWindow.index = MainWindow.receipt_list.index(receipt_number)
-                self.page_number.config(text = f"{MainWindow.index+1} of {MainWindow.page_amount}")                                
-                self.page_number.config(text= f"{MainWindow.index+1} of {MainWindow.page_amount}")
-                print(MainWindow.receipt_dict[receipt_number], "-found")
+            if search_type == "Receipt":
+                try: 
+                    search_field = int(search_field)
+                except ValueError:
+                    pass 
+                else: 
+                    if search_field == receipt_number: 
+                        self.receipt_shifting(receipt_number)
+                        if active == True: 
+                            
+                            self.receipt_storage.insert(END, f"Name: {receipt_list[0]} - Receipt: {receipt_number} - Item: {receipt_list[1]} - Amount: {receipt_list[2]}")
+            elif receipt_list[search_type] == search_field and active == True: #if user search matches name/item (index value determines what function is searching for)
+                print(self.receipt_dict[receipt_number], "-found")
                 item_text = f"Name: {receipt_list[0]} - Receipt: {receipt_number} - Item: {receipt_list[1]} - Amount: {receipt_list[2]}"
                 self.receipt_storage.insert(END, item_text)
-        if not self.receipt_storage.get(0):
-            print('no')
-            self.receipt_storage.insert(END, "No Search Results")
-
-    def receipt_search (self,receipt_number, active):
-
-        try:
-            receipt_number = int(receipt_number)
-        except ValueError:
-            pass
-            
-        else:
-            if receipt_number in MainWindow.receipt_list: 
-                self.receipt_shifting(receipt_number)
-                if active == True: 
-
-                    item_text = f"Name: {MainWindow.receipt_dict[receipt_number][0]} - Receipt: {receipt_number} - Item: {MainWindow.receipt_dict[receipt_number][1]} Amount: {MainWindow.receipt_dict[receipt_number][2]}"
-                    self.receipt_storage.insert(END, item_text)
         if active == True and not self.receipt_storage.get(0) :
             print('no')
             self.receipt_storage.insert(END, "No Search Results")
+        
             
     def double_click (self, event):
         selected_receipt = self.receipt_storage.get(self.receipt_storage.curselection())
@@ -251,21 +259,21 @@ class MainWindow:
     
     def receipt_shifting (self,receipt_number):
         
-        receipt_list = MainWindow.receipt_dict[receipt_number]
-        MainWindow.index = MainWindow.receipt_list.index(receipt_number)
+        receipt_list = self.receipt_dict[receipt_number]
+        self.index = self.receipt_list.index(receipt_number)
         
-        self.page_number.config(text= f"{MainWindow.index+1} of {MainWindow.page_amount}")
-        print(receipt_list, "receipt list", MainWindow.index, " index")
-        print (MainWindow.receipt_dict, "whole dict")
+        self.page_number.config(text= f"{self.index+1} of {self.page_amount}")
+        print(receipt_list, "receipt list", self.index, " index")
+        print (self.receipt_dict, "whole dict")
 
         self.receipt_image.config(text= f"Store \nName: {receipt_list[0]}\nReciept: {receipt_number}\nItem: {receipt_list[1]}\nAmount: {receipt_list[2]}")
-        if MainWindow.page_amount == 1 and MainWindow.index ==0 : 
+        if self.page_amount == 1 and self.index ==0 : 
             self.forward.config(state= DISABLED)
             self.back.config(state= DISABLED)
-        elif MainWindow.index+1 == MainWindow.page_amount: 
+        elif self.index+1 == self.page_amount: 
             self.forward.config(state= DISABLED)
             self.back.config(state= ACTIVE)
-        elif MainWindow.index == 0:
+        elif self.index == 0:
             self.forward.config(state= ACTIVE)
             self.back.config(state= DISABLED)
 
@@ -273,36 +281,35 @@ class MainWindow:
             self.forward.config(state= ACTIVE)
             self.back.config(state= ACTIVE)
     def delete (self):
-        print(MainWindow.index)
+        print(self.index)
         try:
-            receipt_number = MainWindow.receipt_list[MainWindow.index]
+            receipt_number = self.receipt_list[self.index]
             print(receipt_number)
         except IndexError: 
             messagebox.showerror("ERROR", "There are no receipts to return")
         else:
-            MainWindow.receipt_dict.pop(receipt_number)
-            MainWindow.receipt_list.remove(receipt_number)
-            MainWindow.page_amount -= 1 
-            print (MainWindow.index)
-            if MainWindow.index == MainWindow.page_amount:
-                MainWindow.index -= 1 
+            self.receipt_dict.pop(receipt_number)
+            self.receipt_list.remove(receipt_number)
+            self.page_amount -= 1 
+            print (self.index)
+            if self.index == self.page_amount:
+                self.index -= 1 
             
-            if MainWindow.page_amount == 0: 
+            if self.page_amount == 0: 
                 self.receipt_image.config(text= f"No receipts\n\n\n\n")
-                self.page_number.config(text = f"{MainWindow.index+1} of {MainWindow.page_amount}")
+                self.page_number.config(text = f"{self.index+1} of {self.page_amount}")
             else:
-                self.receipt_shifting(receipt_number=MainWindow.receipt_list[MainWindow.index])
+                self.receipt_shifting(receipt_number=self.receipt_list[self.index])
             
     
     def add(self, name, item, amount): 
-        
         
         error = False
         error_text = []
         
         while True:
             receipt_number = randint(100,999)
-            if receipt_number in MainWindow.receipt_list:
+            if receipt_number in self.receipt_list:
                 receipt_number = randint(100,999)
             else:
                 break  
@@ -321,31 +328,24 @@ class MainWindow:
             
             messagebox.showerror("error", f"Invalid { ', '.join(map(str, error_text))}")
         else:
-            MainWindow.receipt_dict.update({receipt_number: [name,item, amount]})
-            MainWindow.receipt_list.append(receipt_number)
-            MainWindow.page_amount += 1
+            self.receipt_dict.update({receipt_number: [name,item, amount]})
+            self.receipt_list.append(receipt_number)
+            self.page_amount += 1
             self.receipt_shifting(receipt_number)
-        
     
-    def next_receipt(self): 
-        MainWindow.index += 1
+    def nav(self, button): 
+        
+        if button == "left":
+            self.index -= 1 
+        else:
+            self.index += 1
+        
         self.forward.config(state=ACTIVE)
         self.back.config(state=ACTIVE)
         
-        receipt_number = MainWindow.receipt_list[MainWindow.index]
+        receipt_number = self.receipt_list[self.index]
         self.receipt_shifting(receipt_number)
-    def previous_receipt(self): 
-        MainWindow.index -= 1
-        self.forward.config(state=ACTIVE)
-        self.back.config(state= ACTIVE)
-        
-        
-        receipt_number = MainWindow.receipt_list[MainWindow.index]
-        print(receipt_number)
-        receipt_list = MainWindow.receipt_dict[receipt_number]
-        
-        self.receipt_shifting(receipt_number)
-
+    
     def quit (self):
         root.destroy()
 
