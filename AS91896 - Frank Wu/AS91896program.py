@@ -1,12 +1,11 @@
 from tkinter import * 
-from tkinter import messagebox
-from tkinter import ttk
-import json
+from tkinter import ttk, messagebox
 from random import randint
+import json
 
 class MainWindow: 
     def __init__(self, master):
-        with open("AS91896 - Frank Wu\storage.json") as file:
+        with open("storage.json") as file:
             self.data = json.load(file)
             print(self.data)
             self.receipt_list = self.data["orders"]
@@ -30,7 +29,8 @@ class MainWindow:
         self.style.configure("main.TFrame", font = (None, 12) , background = "#fbfbfb" )
         self.style.configure("sub.TFrame", font = (None, 12) , background = "SystemButtonFace" )
 
-        self.style.configure('TButton', font = (None, 12), foreground = "Black")      
+        self.style.configure('TButton', font = (None, 12), foreground = "Black") 
+        self.style.configure('TEntry', foreground = 'black')     
     
         
 
@@ -42,20 +42,25 @@ class MainWindow:
         menubar = Menu(master)
         master.config(menu=menubar)
         tool_menu = Menu(menubar, tearoff= 0)
-        menubar.add_cascade(label="Tools", menu= tool_menu )
         
+        menubar.add_cascade(label="Tools", menu= tool_menu )
         tool_menu.add_command(label="Advanced Search", command= self.search_window)
         
-        
         themes_submenu = Menu(tool_menu, tearoff= 0)
-        themes_submenu.add_command(label= "Light" ,command= lambda :self.themes("Light")) #SystemButtonFace for default colour
-    
-        themes_submenu.add_command(label= "Dark" ,command= lambda :self.themes("Dark"))
         tool_menu.add_cascade(label="Themes", menu= themes_submenu)
+        themes_submenu.add_command(label= "Light" ,command= lambda :self.themes("Light")) #SystemButtonFace for default colour
+        themes_submenu.add_command(label= "Dark" ,command= lambda :self.themes("Dark"))
+        
+        tool_menu.add_separator()
+        
+        reset_submenu = Menu(tool_menu, tearoff= 0)
+        tool_menu.add_cascade(label="Reset All", menu=reset_submenu )
+        reset_submenu.add_command(label = "Confirm", command = self.reset)
         
         tool_menu.add_separator()
         tool_menu.add_command(label= "Exit", command= self.quit)
         
+        #program title and system mode button 
         ttk.Label(root, text= "Item Hire Tracker" ,  font= ("Arial", 20, 'bold')). pack (pady= 10)
         self.mode_button = ttk.Button(root, text= "Light mode", command= lambda :self.themes("Dark" if self.mode == "Light" else "Light"))
         self.mode_button. pack(anchor= E, padx = 70,   expand= TRUE)
@@ -79,7 +84,7 @@ class MainWindow:
 
         self.amount_label = ttk.Label(self.EntryFrame, text= "enter item amount").grid(row=2, column= 0, pady= 5, padx= 5)    
         self.amount_entry = ttk.Entry(self.EntryFrame)
-        self.amount_entry. grid (row=2, column=1, pady= 5, padx= 5)
+        self.amount_entry.grid (row=2, column=1, pady= 5, padx= 5)
 
         ttk.Button(self.EntryFrame, text= "Buy", command= lambda : self.add(self.name_entry.get().strip().lower(),self.item_entry.get().strip().lower()
                 , self.amount_entry.get().strip().lower()), style= "big.TButton").grid(row=3, column=0, pady= 5)
@@ -134,16 +139,17 @@ class MainWindow:
         Label(SearchWindow, text= 'Double click to select:').pack()
 
         #entry box for user to enter their search, binded to keyrelease so program will run search_choice function every time user stops typing  
-        adv_search_entry = ttk.Entry(SearchWindow)
-        adv_search_entry.bind ("<KeyRelease>", lambda event: self.all_search( adv_search_entry.get().strip()))
-        adv_search_entry.pack(padx= 10, fill= X)
+        self.adv_search_entry = ttk.Entry(SearchWindow)
+        self.adv_search_entry.bind ("<KeyRelease>", lambda event: self.all_search( self.adv_search_entry.get().strip()))
+     
+        self.adv_search_entry.pack(padx= 10, fill= X)
         #listbox to show users search results, when user double clicks on option it displays it on main window
         self.receipt_storage = Listbox(SearchWindow, width= 50, background= "SystemButtonFace" if self.mode == "Light" else "#2b2b2b", 
                                        foreground= "black" if self.mode == "Light" else "white")
         self.receipt_storage.bind('<Double-Button>', (lambda event: self.double_click(self)))
         self.receipt_storage.pack(pady= 10, padx=10, fill= BOTH, expand= TRUE, side= LEFT)
         
-        self.all_search(adv_search_entry.get().strip())
+        self.all_search(self.adv_search_entry.get().strip())
 
 
     def themes (self, mode ): #function to control colour theme of the whole program
@@ -213,20 +219,11 @@ class MainWindow:
         print(self.receipt_list)
         
 
-        self.receipt_image.config(text= f"Store \nName: {receipt_order['name'].title()}\nReciept: {receipt_order['receipt']}\nItem: {receipt_order['item'].title()}\nAmount: {receipt_order['amount']}")
-        if self.page_amount == 1 and self.index ==0 : 
-            self.forward.config(state= DISABLED)
-            self.back.config(state= DISABLED)
-        elif self.index+1 == self.page_amount: 
-            self.forward.config(state= DISABLED)
-            self.back.config(state= ACTIVE)
-        elif self.index == 0:
-            self.forward.config(state= ACTIVE)
-            self.back.config(state= DISABLED)
-        else:
-            self.forward.config(state= ACTIVE)
-            self.back.config(state= ACTIVE)
-            
+        self.receipt_image.config(text= f"Store \nName: {receipt_order['name'].title()}\nReciept: {str(receipt_order['receipt']).zfill(6)}\nItem: {receipt_order['item'].title()}\nAmount: {receipt_order['amount']}")
+        
+        self.forward.config(state= DISABLED if self.page_amount == 1 and self.index ==0 or self.index+1 == self.page_amount else ACTIVE)
+        self.back.config(state= DISABLED if self.page_amount == 1 and self.index ==0  or self.index == 0 else ACTIVE)
+        
     def delete (self):
         print(self.index)
         try:
@@ -247,17 +244,19 @@ class MainWindow:
                 self.page_number.config(text = f"{self.index+1} of {self.page_amount}")
             else:
                 self.receipt_shifting()
+                try:
+                    self.all_search( self.adv_search_entry.get().strip())
+                except: 
+                    pass 
+                
+                
             
     
     def add(self, name, item, amount): 
 
         error_text = [] 
-        while True:
-            receipt_number = randint(100,999)
-            if receipt_number in self.receipt_list:
-                receipt_number = randint(100,999)
-            else:
-                break   
+        self.data["receipts"] += 1 
+        receipt_number =self.data["receipts"]
         if any(number.isdigit() for number in name) or not name:
             self.name_entry.configure(foreground= "red")
             error_text.append("name")
@@ -275,13 +274,13 @@ class MainWindow:
             print(self.receipt_list)
             print(self.data)
             self.page_amount += 1
-            self.index = 0 if self.index == -1 else self.index
+            self.index = 0 if self.index == -1 else self.page_amount -1
             self.receipt_shifting()
-            self.name_entry.configure(foreground= "black"), self.amount_entry.configure(foreground= "black"), self.name_entry.configure(foreground= "black")
+            self.name_entry.configure(foreground= "black"), self.amount_entry.configure(foreground= "black"), self.item_entry.configure(foreground= "black")
             self.write_json()
             
     def write_json(self):
-        with open("AS91896 - Frank Wu\storage.json", 'w') as file:
+        with open("storage.json", 'w') as file:
             json.dump(self.data, file, indent= 4)
             file.close()
             print('json done')
@@ -291,13 +290,19 @@ class MainWindow:
             self.index -= 1 
         else:
             self.index += 1
-        self.forward.config(state=ACTIVE)
-        self.back.config(state=ACTIVE)   
-       
         
         self.receipt_shifting()
         
+    def reset (self):
+        self.data = {"orders": [], "receipts": 0}
+        self.receipt_list = []
+        self.index = -1
+        self.page_amount = 0
+        self.receipt_image.config(text= f"No receipts\n\n\n\n")
+        self.page_number.config(text = f"{self.index+1} of {self.page_amount}")
+        self.write_json()
         
+    
     
     def quit (self):
         root.destroy()
