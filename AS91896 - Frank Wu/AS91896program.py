@@ -3,18 +3,17 @@ from tkinter import ttk, messagebox
 from random import randint
 import json
 
-class MainWindow: 
-    def __init__(self, master):
-        with open("storage.json") as file:
-            self.data = json.load(file)
-            print(self.data)
-            self.receipt_list = self.data["orders"]
-            file.close()
+class MainWindow: #class running the whole program 
+    def __init__(self, master): #when the main class is initiated, the init function runs and creates the GUI for the main window
+        with open("storage.json") as file: #opens the storage.json file and accesses the dictionary in the file
+            self.data = json.load(file) 
+            self.receipt_list = self.data["orders"] #accesses the list of the orders key in the dictionary and stores it in self.receipt_list
+           
         print(self.receipt_list)
         self.index = -1 if not self.receipt_list else 0  #counter to keep count what receipt in the list the program currently is displaying/using, start at -1 because 0 is the item in list
         self.page_amount = 0 if not self.receipt_list else len(self.receipt_list)    #keep count of the total amount of receipts in the program 
         
-        #config the program window
+        #config the main program window
         self.master = master 
         root.title("Receipts")
         root.geometry("700x400")
@@ -22,6 +21,7 @@ class MainWindow:
         self.style.theme_use("xpnative")
         
         self.mode = "Light"
+        #setting up all the styles for fonts/buttons/labels/entryboxes etc. 
         root.configure(bg= "SystemButtonFace")
         self.style.configure(root, font = ("Arial", 12), background = 'SystemButtonFace', foreground = "black")
         
@@ -30,11 +30,8 @@ class MainWindow:
         self.style.configure("sub.TFrame", font = (None, 12) , background = "SystemButtonFace" )
 
         self.style.configure('TButton', font = (None, 12), foreground = "Black") 
-        self.style.configure('TEntry', foreground = 'black')     
-    
-        
-
-        ipadding = {'ipadx':40, 'ipady': 40}
+        self.style.configure('TEntry', foreground = 'black')   
+                  
         padding = {'padx':15, 'pady': 15}
         
 
@@ -87,10 +84,10 @@ class MainWindow:
         self.amount_entry.grid (row=2, column=1, pady= 5, padx= 5)
 
         ttk.Button(self.EntryFrame, text= "Buy", command= lambda : self.add(self.name_entry.get().strip().lower(),self.item_entry.get().strip().lower()
-                , self.amount_entry.get().strip().lower()), style= "big.TButton").grid(row=3, column=0, pady= 5)
+                , self.amount_entry.get().strip().lower()), style= "big.TButton").grid(row=3, column=1, pady= 5)
         
         
-        ttk.Button(self.EntryFrame, text = "Return", command = self.delete).grid(row=3,column=1, pady= 5)
+        ttk.Button(self.EntryFrame, text = "Return", command = self.delete).grid(row=3,column=0, pady= 5)
 
         # frame with the receipt search bar 
         SearchFrame = ttk.LabelFrame(frame, text= "Search Receipt Number", style= "sub.TFrame")
@@ -119,14 +116,13 @@ class MainWindow:
         self.forward = ttk.Button(DisplayFrame, text= "→", command=lambda  : self.nav("right"), state= DISABLED)
         self.forward.pack( side= LEFT, expand= TRUE ,anchor= CENTER, pady=10)
         
-        if self.receipt_list:
-            
+        if self.receipt_list: #checks if program started with any preloaded infomation in the order list, and updates the program to show this info
             self.receipt_shifting()
             
             
     def search_window (self):   #function to initiate advanced search window 
-        #window config stuff
         
+        #window config stuff
         SearchWindow = Toplevel(root)
         SearchWindow.title('Advanced Search')
         SearchWindow.configure(bg= "SystemButtonFace" if self.mode == "Light" else "#2b2b2b" )
@@ -134,6 +130,7 @@ class MainWindow:
         style.theme_use("xpnative")
         style.configure("TCombobox", foreground = "black")
 
+        #Title and label for the window
         Label(SearchWindow, text='Search In All Receipts', font = ("Arial", 15, "bold"), foreground= "black" if self.mode == "Light" else "white", 
               background="SystemButtonFace" if self.mode == "Light" else "#2b2b2b" ).pack(pady= 10 )
         Label(SearchWindow, text= 'Double click to select:').pack()
@@ -187,110 +184,92 @@ class MainWindow:
             print('no')
             self.receipt_storage.insert(END, "No Search Results")  
             
-    def receipt_number_search (self, search_field ):
-        for dicts in self.receipt_list:
-             #get the receipt number (key), and receipt list (value of key)
+    
+            
+    def double_click (self, event): #updates main window to display the order that the user has selected in the advanced search window
+        selected_receipt = self.receipt_storage.get(self.receipt_storage.curselection()) #gets the string that the user has selected 
+        receipt_number = int(selected_receipt[selected_receipt.find("Receipt")+9: selected_receipt.find("Item")-3].strip()) # in that string, it extracts the receipt number displayed in the string
+        print (receipt_number)
+        self.index = next((index for (index, dict) in enumerate(self.receipt_list) if dict["receipt"] == receipt_number), None) #searches for the dictionary that matches the receipt number, then finds the index of that dictionary in the self.receipt_list list
+        self.receipt_shifting() #updates the main window to display the order
+    
+    def receipt_number_search (self, search_field ): #function to search for orders using receipt number 
+        for dicts in self.receipt_list: # for every dictionary in the self.receipt_list list, it checks if the users receipt number input matches any of those dictionaries "receipt" value
+
             print (dicts, '-receipt list')
-            try: 
-                search_field = int(search_field)
+            try: #try converting user receipt number input into a interger, if user didnt input a interger the funciton wont run 
+                search_field = int(search_field) 
             except ValueError:
                 pass 
-            else: 
+            else: #if user receipt number imput matches a value of "receipt" key in the dictionary, it finds the index of the dictionary in the self.receipt_list list and then runs the receipt_shifting funciton to update the main window to display the order
                 if search_field == dicts['receipt']: 
                     self.index = next((index for (index, dict) in enumerate(self.receipt_list) if dict["receipt"] == search_field), None)
                     self.receipt_shifting()
-            
-    def double_click (self, event):
-        selected_receipt = self.receipt_storage.get(self.receipt_storage.curselection())
-        receipt_number = int(selected_receipt[selected_receipt.find("Receipt")+9: selected_receipt.find("Item")-3].strip())
-        print (receipt_number)
-        self.index = next((index for (index, dict) in enumerate(self.receipt_list) if dict["receipt"] == receipt_number), None)
-        self.receipt_shifting()
-    
-    def receipt_shifting (self):
+                    
+    def receipt_shifting (self): #funtion that updates the main window to display the order
+     
+        receipt_order = self.receipt_list[self.index] #the dictionary of the order that is going to get displayed
         
         
-        
-        receipt_order = self.receipt_list[self.index]
-        
-        
-        self.page_number.config(text= f"{self.index+1} of {self.page_amount}")
+        self.page_number.config(text= f"{self.index+1} of {self.page_amount}") #updates the page number to show where the order is in the total stored orders
         print(receipt_order, "receipt list", self.index, " index")
         print(self.receipt_list)
         
-
-        self.receipt_image.config(text= f"Store \nName: {receipt_order['name'].title()}\nReciept: {str(receipt_order['receipt']).zfill(6)}\nItem: {receipt_order['item'].title()}\nAmount: {receipt_order['amount']}")
+        #updates the self.receipt_image Label on the main window to display the current order 
+        self.receipt_image.config(text= f"Store \nName: {receipt_order['name'].title()}\nReciept: {str(receipt_order['receipt']).zfill(6)}\nItem: {receipt_order['item'].title()}\nAmount: {receipt_order['amount']}") 
         
+        #updates nav buttons according to the position of the displayed order in the self.receipt_list 
         self.forward.config(state= DISABLED if self.page_amount == 1 and self.index ==0 or self.index+1 == self.page_amount else ACTIVE)
         self.back.config(state= DISABLED if self.page_amount == 1 and self.index ==0  or self.index == 0 else ACTIVE)
         
-    def delete (self):
+    def delete (self): #deletes active order being displayed on main window  
         print(self.index)
-        try:
-            self.receipt_list.pop(self.index)
+        try: #deletes active order from self.receipt_list and from json file
+            self.receipt_list.pop(self.index) 
             self.write_json()
   
-        except IndexError: 
+        except IndexError: # if there is nothing in self.receipt_list this means theres no orders, meaning it will error
             messagebox.showerror("ERROR", "There are no receipts to return")
         else:
-            
-           
             self.page_amount -= 1 
             
-            if self.index == self.page_amount:
-                self.index -= 1 
+            if self.index == self.page_amount: self.index -= 1 
+            
             if self.page_amount == 0: 
                 self.receipt_image.config(text= f"No receipts\n\n\n\n")
                 self.page_number.config(text = f"{self.index+1} of {self.page_amount}")
             else:
                 self.receipt_shifting()
-                try:
-                    self.all_search( self.adv_search_entry.get().strip())
-                except: 
-                    pass 
+                try: self.all_search( self.adv_search_entry.get().strip())
+                except: pass 
                 
                 
             
     
-    def add(self, name, item, amount): 
+    def add(self, name, item, amount): # checks for errors in user order input and then adds the order dictionary to the json file 
 
         error_text = [] 
         self.data["receipts"] += 1 
         receipt_number =self.data["receipts"]
-        if any(number.isdigit() for number in name) or not name:
-            self.name_entry.configure(foreground= "red")
-            error_text.append("name")
-        if  any(number.isdigit() for number in item) or not item:
-            self.item_entry.configure(foreground= "red")
-            error_text.append("item")
-        if not amount or not amount.isdigit() or int(amount)>500 or int(amount)<1:
-            self.amount_entry.configure(foreground= "red")
-            error_text.append("item-amount(1-500)")     
-        if error_text:        
-            messagebox.showerror("Error", f"Invalid { ', '.join(map(str, error_text))}")
-        else:
-            
+        if any(number.isdigit() for number in name) or not name:self.name_entry.configure(foreground= "red"), error_text.append("name") #error checking for invalid name
+        if  any(number.isdigit() for number in item) or not item: self.item_entry.configure(foreground= "red"), error_text.append("item") #error checking for invalid item 
+        if not amount or not amount.isdigit() or int(amount)>500 or int(amount)<1: self.amount_entry.configure(foreground= "red"), error_text.append("item-amount(1-500)") #error chekcing for invalid item    
+        if error_text: messagebox.showerror("Error", f"Invalid { ', '.join(map(str, error_text))}")
+        else: 
             self.receipt_list.append({"receipt": receipt_number, "name": name, "item": item, "amount": amount})
-            print(self.receipt_list)
-            print(self.data)
             self.page_amount += 1
             self.index = 0 if self.index == -1 else self.page_amount -1
+            self.name_entry.configure(foreground= "black"), self.item_entry.configure(foreground= "black"), self.amount_entry.configure(foreground= "black")
             self.receipt_shifting()
-            self.name_entry.configure(foreground= "black"), self.amount_entry.configure(foreground= "black"), self.item_entry.configure(foreground= "black")
             self.write_json()
             
     def write_json(self):
-        with open("storage.json", 'w') as file:
-            json.dump(self.data, file, indent= 4)
-            file.close()
-            print('json done')
+        with open("storage.json", 'w') as file: json.dump(self.data, file, indent= 4)
+            
             
     def nav(self, button):         
-        if button == "left":
-            self.index -= 1 
-        else:
-            self.index += 1
-        
+        if button == "left": self.index -= 1 
+        else: self.index += 1
         self.receipt_shifting()
         
     def reset (self):
@@ -302,7 +281,6 @@ class MainWindow:
         self.page_number.config(text = f"{self.index+1} of {self.page_amount}")
         self.write_json()
         
-    
     
     def quit (self):
         root.destroy()
