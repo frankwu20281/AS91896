@@ -1,6 +1,5 @@
 from tkinter import * 
 from tkinter import ttk, messagebox
-from random import randint
 import json
 
 class MainWindow: #class running the whole program 
@@ -123,28 +122,26 @@ class MainWindow: #class running the whole program
     def search_window (self):   #function to initiate advanced search window 
         
         #window config stuff
-        SearchWindow = Toplevel(root)
-        SearchWindow.title('Advanced Search')
-        SearchWindow.configure(bg= "SystemButtonFace" if self.mode == "Light" else "#2b2b2b" )
-        style = ttk.Style(SearchWindow)
-        style.theme_use("xpnative")
-        style.configure("Treeview", foreground = "black")
+        self.SearchWindow = Toplevel(root)
+        self.SearchWindow.title('Advanced Search')
+        self.SearchWindow.configure(bg= "SystemButtonFace" if self.mode == "Light" else "#2b2b2b" )
+        self.searchwindowstyle = ttk.Style(self.SearchWindow)
+        self.searchwindowstyle.theme_use("xpnative")
+        self.searchwindowstyle.configure("Treeview", foreground = "black")
         self.sort_direction = True
         #Title and label for the window
-        Label(SearchWindow, text='Search In All Receipts', font = ("Arial", 15, "bold"), foreground= "black" if self.mode == "Light" else "white", 
-              background= "SystemButtonFace" if self.mode == "Light" else "#2b2b2b" ).pack(pady= 10 )
-        Label(SearchWindow, text= 'Click to select:', foreground= "black" if self.mode == "Light" else "white", 
-              background= "SystemButtonFace" if self.mode == "Light" else "#2b2b2b").pack()
+        ttk.Label(self.SearchWindow, text='Search In All Receipts', font = ("Arial", 15, "bold") ).pack(pady= 10 )
+        ttk.Label(self.SearchWindow, text= 'Click to select:').pack()
 
         #entry box for user to enter their search, binded to keyrelease so program will run search_choice function every time user stops typing  
-        self.adv_search_entry = ttk.Entry(SearchWindow)
+        self.adv_search_entry = ttk.Entry(self.SearchWindow)
         self.adv_search_entry.bind ("<KeyRelease>", lambda event: self.all_search( self.adv_search_entry.get().strip()))
         self.adv_search_entry.pack(padx= 10, fill= X)
         
         columns= ('Receipt', 'Name', 'Item', 'Amount')
         
-        scrollbar = Scrollbar(SearchWindow)
-        self.tree_table = ttk.Treeview(SearchWindow, columns=columns, show = 'headings',yscrollcommand = scrollbar.set)
+        scrollbar = Scrollbar(self.SearchWindow)
+        self.tree_table = ttk.Treeview(self.SearchWindow, columns=columns, show = 'headings',yscrollcommand = scrollbar.set)
         scrollbar.config(command = self.tree_table.yview)
         scrollbar.pack(side= RIGHT, fill= Y, pady= 10)
         
@@ -186,6 +183,15 @@ class MainWindow: #class running the whole program
         self.style.configure("sub.TFrame", font = (None, 12) , background = "#2b2b2b" if mode == 'Dark' else"SystemButtonFace"  )
 
         self.style.configure('TButton', font = (None, 12), foreground = "#262626"if mode == 'Dark' else "Black")
+
+        try: 
+            self.searchwindowstyle.configure('TLabel', foreground= "black" if self.mode == "Light" else "white", 
+              background= "SystemButtonFace" if self.mode == "Light" else "#2b2b2b")
+            self.SearchWindow.configure(bg= "SystemButtonFace" if self.mode == "Light" else "#2b2b2b" )
+            
+
+        except: 
+            pass 
 
     def sorting (self, selected, sort_direction): 
         self.sort_direction = sort_direction
