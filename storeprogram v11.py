@@ -128,12 +128,13 @@ class MainWindow: #class running the whole program
         SearchWindow.configure(bg= "SystemButtonFace" if self.mode == "Light" else "#2b2b2b" )
         style = ttk.Style(SearchWindow)
         style.theme_use("xpnative")
-        style.configure("TCombobox", foreground = "black")
+        style.configure("Treeview", foreground = "black")
         self.sort_direction = True
         #Title and label for the window
         Label(SearchWindow, text='Search In All Receipts', font = ("Arial", 15, "bold"), foreground= "black" if self.mode == "Light" else "white", 
-              background="SystemButtonFace" if self.mode == "Light" else "#2b2b2b" ).pack(pady= 10 )
-        Label(SearchWindow, text= 'Double click to select:').pack()
+              background= "SystemButtonFace" if self.mode == "Light" else "#2b2b2b" ).pack(pady= 10 )
+        Label(SearchWindow, text= 'Click to select:', foreground= "black" if self.mode == "Light" else "white", 
+              background= "SystemButtonFace" if self.mode == "Light" else "#2b2b2b").pack()
 
         #entry box for user to enter their search, binded to keyrelease so program will run search_choice function every time user stops typing  
         self.adv_search_entry = ttk.Entry(SearchWindow)
@@ -145,7 +146,7 @@ class MainWindow: #class running the whole program
         scrollbar = Scrollbar(SearchWindow)
         self.tree_table = ttk.Treeview(SearchWindow, columns=columns, show = 'headings',yscrollcommand = scrollbar.set)
         scrollbar.config(command = self.tree_table.yview)
-        scrollbar.pack(side= RIGHT, fill= Y)
+        scrollbar.pack(side= RIGHT, fill= Y, pady= 10)
         
         self.tree_table.heading('Receipt', text = "Receipt number", command= lambda: self.sorting('Receipt', False if self.sort_direction  else True))
         self.tree_table.column('Receipt', anchor='center', minwidth=50)
