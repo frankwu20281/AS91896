@@ -122,26 +122,28 @@ class MainWindow: #class running the whole program
     def search_window (self):   #function to initiate advanced search window 
         
         #window config stuff
-        self.SearchWindow = Toplevel(root)
-        self.SearchWindow.title('Advanced Search')
-        self.SearchWindow.configure(bg= "SystemButtonFace" if self.mode == "Light" else "#2b2b2b" )
-        self.searchwindowstyle = ttk.Style(self.SearchWindow)
+        global SearchWindow
+        SearchWindow = Toplevel(root)
+        SearchWindow.title('Advanced Search')
+        SearchWindow.configure(bg= "SystemButtonFace" if self.mode == "Light" else "#2b2b2b" )
+        self.searchwindowstyle = ttk.Style(SearchWindow)
         self.searchwindowstyle.theme_use("xpnative")
         self.searchwindowstyle.configure("Treeview", foreground = "black")
+        self.searchwindowstyle.configure("Treeview.Heading", foreground="black")
         self.sort_direction = True
         #Title and label for the window
-        ttk.Label(self.SearchWindow, text='Search In All Receipts', font = ("Arial", 15, "bold") ).pack(pady= 10 )
-        ttk.Label(self.SearchWindow, text= 'Click to select:').pack()
+        ttk.Label(SearchWindow, text='Search In All Receipts', font = ("Arial", 15, "bold") ).pack(pady= 10 )
+        ttk.Label(SearchWindow, text= 'Click to display on main window:').pack()
 
         #entry box for user to enter their search, binded to keyrelease so program will run search_choice function every time user stops typing  
-        self.adv_search_entry = ttk.Entry(self.SearchWindow)
+        self.adv_search_entry = ttk.Entry(SearchWindow)
         self.adv_search_entry.bind ("<KeyRelease>", lambda event: self.all_search( self.adv_search_entry.get().strip()))
         self.adv_search_entry.pack(padx= 10, fill= X)
         
         columns= ('Receipt', 'Name', 'Item', 'Amount')
         
-        scrollbar = Scrollbar(self.SearchWindow)
-        self.tree_table = ttk.Treeview(self.SearchWindow, columns=columns, show = 'headings',yscrollcommand = scrollbar.set)
+        scrollbar = Scrollbar(SearchWindow)
+        self.tree_table = ttk.Treeview(SearchWindow, columns=columns, show = 'headings',yscrollcommand = scrollbar.set)
         scrollbar.config(command = self.tree_table.yview)
         scrollbar.pack(side= RIGHT, fill= Y, pady= 10)
         
@@ -187,7 +189,7 @@ class MainWindow: #class running the whole program
         try: 
             self.searchwindowstyle.configure('TLabel', foreground= "black" if self.mode == "Light" else "white", 
               background= "SystemButtonFace" if self.mode == "Light" else "#2b2b2b")
-            self.SearchWindow.configure(bg= "SystemButtonFace" if self.mode == "Light" else "#2b2b2b" )
+            SearchWindow.configure(bg= "SystemButtonFace" if self.mode == "Light" else "#2b2b2b" )
             
 
         except: 
@@ -197,8 +199,11 @@ class MainWindow: #class running the whole program
         self.sort_direction = sort_direction
         print(self.sort_direction)
         data = [(self.tree_table.set(child, selected), child) for child in self.tree_table.get_children('')]
+        print(data,'before')
         data.sort(reverse= sort_direction)
+        print(data, 'after')
         for index, (value, child) in enumerate(data):
+            print (index, 'index-', child , "child")
             self.tree_table.move(child, '', index)
 
         for column in self.tree_table['columns']:
@@ -228,7 +233,7 @@ class MainWindow: #class running the whole program
                 self.tree_table. insert ('', END, values = (search['receipt'],search['name'].title(),search['item'].title(),search['amount']))
             elif typed.lower() in str(search['receipt']) or typed.lower() in search['name'] or typed.lower() in search['item']or typed.lower() in search['amount']:   # if user has typed something and it matches something in a receipt, display it in listbox
                 self.tree_table. insert ('', END, values = (search['receipt'],search['name'].title(),search['item'].title(),search['amount']))
-                self.receipt_storage.insert(END, search)
+
         if not self.tree_table.get_children(0): #if user search doesnt match anything, tell user there are no search results
             print('no')
             self.tree_table. insert ('', END, values = ('No Results','-','-',''))
