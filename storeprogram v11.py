@@ -58,8 +58,10 @@ class MainWindow: #class running the whole program
         
         #program title and system mode button 
         ttk.Label(root, text= "Item Hire Tracker" ,  font= ("Arial", 20, 'bold')). pack (pady= 10)
+        ttk.Button(root, text= "Search All", command= self.search_window).pack(padx=5, pady = 5)
         self.mode_button = ttk.Button(root, text= "Light mode", command= lambda :self.themes("Dark" if self.mode == "Light" else "Light"))
         self.mode_button. pack(anchor= E, padx = 70,   expand= TRUE)
+        
         
         #creating 'master' frame to put all ui stuff in
         
@@ -133,7 +135,7 @@ class MainWindow: #class running the whole program
         self.sort_direction = True
         #Title and label for the window
         ttk.Label(SearchWindow, text='Search In All Receipts', font = ("Arial", 15, "bold") ).pack(pady= 10 )
-        ttk.Label(SearchWindow, text= 'Click to display on main window:').pack()
+        ttk.Label(SearchWindow, text= 'Search for anything and click to display on main window:').pack()
 
         #entry box for user to enter their search, binded to keyrelease so program will run search_choice function every time user stops typing  
         self.adv_search_entry = ttk.Entry(SearchWindow)
@@ -198,7 +200,7 @@ class MainWindow: #class running the whole program
     def sorting (self, selected, sort_direction): 
         self.sort_direction = sort_direction
         print(self.sort_direction)
-        data = [(self.tree_table.set(child, selected), child) for child in self.tree_table.get_children('')]
+        data = [(int(self.tree_table.set(child, selected))if selected == "Receipt" or selected == "Amount" else (self.tree_table.set(child, selected) ), child) for child in self.tree_table.get_children('')]
         print(data,'before')
         data.sort(reverse= sort_direction)
         print(data, 'after')
