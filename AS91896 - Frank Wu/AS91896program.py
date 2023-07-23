@@ -77,7 +77,7 @@ class Main_window: # The Main_window class initiates the GUI part of the program
         self.amount_entry = ttk.Entry(entry_frame)
         self.amount_entry.grid (row=2, column=1, pady= 5, padx= 5)
         #Buy button that runs the Add function when pressed
-        ttk.Button(entry_frame, text= "Add", command= lambda : self.Add(self.name_entry.get().strip().lower(),self.item_entry.get().strip().lower()
+        ttk.Button(entry_frame, text= "Hire", command= lambda : self.Add(self.name_entry.get().strip().lower(),self.item_entry.get().strip().lower()
                 , self.amount_entry.get().strip().lower()), style= "big.TButton").grid(row=3, column=1, pady= 5)
         #Return button that runs the Delete function when pressed
         ttk.Button(entry_frame, text = "Return", command = self.Delete).grid(row=3,column=0, pady= 5)
@@ -262,23 +262,24 @@ class Main_window: # The Main_window class initiates the GUI part of the program
         Description: Deletes the current order that is being displayed on the mainwindow from self.receipt_list
         Args: None 
         Returns: None
-        ''' 
-        try: #Deletes active order from receipt_list and from json file
-            receipt_list.pop(self.index) 
-            with open("storage.json", 'w') as file: json.dump(data, file, indent= 4)
-        except IndexError: # If there is nothing in receipt_list this means theres no orders, meaning it will error
+        '''
+        if len(receipt_list) == 0: 
             messagebox.showerror("ERROR", "There are no receipts to return") # Messagebox to tell the user about the error
         else:
-            self.page_amount -= 1 #Changes the index since the current receipt has been deleted, meaning the previous receipt should be displayed
-        
-            if self.index == self.page_amount: self.index -= 1 # If the deleted receipt is the last one, then index doesnt change since there is nothing before the first order 
-            if self.page_amount == 0: # If after deleting the receipt, if there is no receipts left to display, change the label to "No Receipts"
-                receipt_data_display.config(text= f"No Receipts\n\n\n\n")
-                self.page_number.config(text = f"{self.index+1} of {self.page_amount}")
-            else: # If after deleting there are still receipts to display, run the Receipt_shifting function to display the new receipt data
-                self.Receipt_shifting()
-                try: self.All_search( self.adv_search_entry.get().strip()) # If the advanced search window is open, update the table to remove the deleted receipt data
-                except: pass      
+            confirmation = messagebox.askyesno('Confirmation','Are you sure you want to return this item?')
+            if confirmation:
+                    receipt_list.pop(self.index) #Deletes active order from receipt_list and from json file
+                    with open("storage.json", 'w') as file: json.dump(data, file, indent= 4)
+                    self.page_amount -= 1 #Changes the index since the current receipt has been deleted, meaning the previous receipt should be displayed
+                
+                    if self.index == self.page_amount: self.index -= 1 # If the deleted receipt is the last one, then index doesnt change since there is nothing before the first order 
+                    if self.page_amount == 0: # If after deleting the receipt, if there is no receipts left to display, change the label to "No Receipts"
+                        receipt_data_display.config(text= f"No Receipts\n\n\n\n")
+                        self.page_number.config(text = f"{self.index+1} of {self.page_amount}")
+                    else: # If after deleting there are still receipts to display, run the Receipt_shifting function to display the new receipt data
+                        self.Receipt_shifting()
+                        try: self.All_search( self.adv_search_entry.get().strip()) # If the advanced search window is open, update the table to remove the deleted receipt data
+                        except: pass      
     
     def Add(self, name, item, quantity): 
         '''
@@ -290,7 +291,7 @@ class Main_window: # The Main_window class initiates the GUI part of the program
         error_text= '' #Error text that will be displayed using the messagebox 
         self.name_entry.configure(foreground= "black"), self.item_entry.configure(foreground= "black"), self.amount_entry.configure(foreground= "black")
         if not name.isalpha() or not name: #Error checking for invalid name
-            if error_text == '': error_text += " Name" #Adding name to the error text
+            if error_text == '': error_text += " name" #Adding name to the error text
             else: error_text += ", name " 
             self.name_entry.configure(foreground= "red") #Changing the text on the name entrybox to red to show user there is an error there
         if not item.isalpha() or not item: #Error checking for invalid item name
@@ -299,7 +300,7 @@ class Main_window: # The Main_window class initiates the GUI part of the program
             
             self.item_entry.configure(foreground= "red") #Changing the text on the item entrybox to red to show user there is an error there
         if not quantity or not quantity.isdigit() or int(quantity)>500 or int(quantity)<1: #Error checking for invalid item quantity
-            if error_text == '': error_text += "item quantity" #Adding item quantity to the error text
+            if error_text == '': error_text += " item quantity" #Adding item quantity to the error text
             else: error_text += ", item quantity (1-500)"
             self.amount_entry.configure(foreground= "red") #Changing the text on the quantity entrybox to red to show user there is an error there
         if error_text: #If there are any errors, then display a messagebox that tells the user where the errors are
@@ -310,7 +311,6 @@ class Main_window: # The Main_window class initiates the GUI part of the program
             receipt_list.append({"receipt": data["receipt_numbers"] , "name": name, "item": item, "quantity": quantity}) #Adding the data to receipt_list in a dictonary form
             self.page_amount += 1 #Increasing the page amount by one since we have added one receipt data to receipt_list
             self.index = 0 if self.index == -1 else self.page_amount - 1 #Changes the index to match where the newly added receipt data is placed in receipt_list
-            self.name_entry.configure(foreground= "black"), self.item_entry.configure(foreground= "black"), self.amount_entry.configure(foreground= "black") #Changes all the entrybox text back to black since there are no errors
             with open("storage.json", 'w') as file: json.dump(data, file, indent= 4) #Adds the updated receipt_list and receipt_numbers to the JSON file
             self.name_entry.delete(0,END),self.item_entry.delete(0,END),self.amount_entry.delete(0,END) # Deletes the text in all of the entryboxes 
             self.Receipt_shifting() # Run the Receipt_shifting function to update the display window to show the newly added receipt data 
