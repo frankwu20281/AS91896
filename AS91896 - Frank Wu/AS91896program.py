@@ -288,12 +288,12 @@ class Main_window: # The Main_window class initiates the GUI part of the program
         '''
         
         error_text= '' #Error text that will be displayed using the messagebox 
-        
-        if any(number.isdigit() for number in name) or not name: #Error checking for invalid name
+        self.name_entry.configure(foreground= "black"), self.item_entry.configure(foreground= "black"), self.amount_entry.configure(foreground= "black")
+        if not name.isalpha() or not name: #Error checking for invalid name
             if error_text == '': error_text += " Name" #Adding name to the error text
             else: error_text += ", name " 
             self.name_entry.configure(foreground= "red") #Changing the text on the name entrybox to red to show user there is an error there
-        if  any(number.isdigit() for number in item) or not item: #Error checking for invalid item name
+        if not item.isalpha() or not item: #Error checking for invalid item name
             if error_text == '': error_text += " item name" #Adding item name to the error text
             else: error_text += ", item name" 
             
