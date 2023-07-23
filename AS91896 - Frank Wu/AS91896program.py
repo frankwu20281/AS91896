@@ -77,7 +77,7 @@ class Main_window: # The Main_window class initiates the GUI part of the program
         self.amount_entry = ttk.Entry(entry_frame)
         self.amount_entry.grid (row=2, column=1, pady= 5, padx= 5)
         #Buy button that runs the Add function when pressed
-        ttk.Button(entry_frame, text= "Buy", command= lambda : self.Add(self.name_entry.get().strip().lower(),self.item_entry.get().strip().lower()
+        ttk.Button(entry_frame, text= "Add", command= lambda : self.Add(self.name_entry.get().strip().lower(),self.item_entry.get().strip().lower()
                 , self.amount_entry.get().strip().lower()), style= "big.TButton").grid(row=3, column=1, pady= 5)
         #Return button that runs the Delete function when pressed
         ttk.Button(entry_frame, text = "Return", command = self.Delete).grid(row=3,column=0, pady= 5)
@@ -128,7 +128,7 @@ class Main_window: # The Main_window class initiates the GUI part of the program
         search_window_style.configure("Treeview.Heading", foreground="black") # Setting text of the table heading to be black 
         self.sort_direction = True #Default sorting direction for all the columns 
         #Title and label for the window
-        ttk.Label(new_window, text='Search In All Receipts', font = ("Arial", 15, "bold") ).pack(pady= 10 )
+        ttk.Label(new_window, text='Search All Receipts', font = ("Arial", 15, "bold") ).pack(pady= 10 )
         ttk.Label(new_window, text= 'Search for anything and click to display on main window:').pack()
         #Entry box for user to enter their search, binded to keyrelease so program will run search_choice function every time user stops typing  
         self.adv_search_entry = ttk.Entry(new_window)
@@ -209,7 +209,7 @@ class Main_window: # The Main_window class initiates the GUI part of the program
                 self.tree_table. insert ('', END, values = (search['receipt'],search['name'].title(),search['item'].title(),search['quantity']))
             elif typed.lower() in str(search['receipt']) or typed.lower() in search['name'] or typed.lower() in search['item']or typed.lower() in search['quantity']:   # if user has typed something and it matches something in a receipt, display it in listbox
                 self.tree_table. insert ('', END, values = (search['receipt'],search['name'].title(),search['item'].title(),search['quantity']))
-        if not self.tree_table.get_children(0): self.tree_table. insert ('', END, values = ('No Results','-','-','')) #if user search doesnt match anything, tell user there are no search results
+        if not self.tree_table.get_children(0): self.tree_table. insert ('', END, values = ('No Results','-','-','-')) #if user search doesnt match anything, tell user there are no search results
 
     def Double_click (self, event ,selected_receipt): 
         '''
@@ -312,6 +312,7 @@ class Main_window: # The Main_window class initiates the GUI part of the program
             self.index = 0 if self.index == -1 else self.page_amount - 1 #Changes the index to match where the newly added receipt data is placed in receipt_list
             self.name_entry.configure(foreground= "black"), self.item_entry.configure(foreground= "black"), self.amount_entry.configure(foreground= "black") #Changes all the entrybox text back to black since there are no errors
             with open("storage.json", 'w') as file: json.dump(data, file, indent= 4) #Adds the updated receipt_list and receipt_numbers to the JSON file
+            self.name_entry.delete(0,END),self.item_entry.delete(0,END),self.amount_entry.delete(0,END) # Deletes the text in all of the entryboxes 
             self.Receipt_shifting() # Run the Receipt_shifting function to update the display window to show the newly added receipt data 
             try: self.All_search( self.adv_search_entry.get().strip()) # If advanced window is open, update the table to also show the newly added receipt data
             except: pass 
