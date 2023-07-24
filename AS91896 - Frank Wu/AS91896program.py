@@ -1,8 +1,8 @@
 from tkinter import * # The tkinter module is imported to create a visual GUI for the user to interact with
 from tkinter import ttk, messagebox # From the tkinter module, the ttk module is imported to accesss tkinter's themed widget set, and also from tkinter module the messagebox function is imported to open messagebox's to display infomation
-import json #The 'json' module is imported in order to effectively work with the saved_data.json file for saving reports.
+import json #The 'json' module is imported in order to effectively work with the saved_data.json file for saving reports. 
 
-class Main_window: # The Main_window class initiates the GUI part of the program and holds all the functions used in the program
+class Main_window(): # The Main_window class initiates the GUI part of the program and holds all the functions used in the program
     def __init__(self,root): 
         '''
         Description: When the Main_window class is run, the __init__ function will automatically run
@@ -138,7 +138,7 @@ class Main_window: # The Main_window class initiates the GUI part of the program
         scrollbar = Scrollbar(new_window)
         
         self.tree_table = ttk.Treeview(new_window, columns=('Receipt', 'Name', 'Item', 'Quantity'), show = 'headings',yscrollcommand = scrollbar.set)
-        self.tree_table.bind('<<TreeviewSelect>>', (lambda event: self.Double_click(self,self.tree_table.item(self.tree_table.selection()))))
+        self.tree_table.bind('<<TreeviewSelect>>', (lambda event: self.Table_selection(self,self.tree_table.item(self.tree_table.selection()))))
         self.tree_table.pack(pady= 10, padx=10, fill= BOTH, expand= TRUE, side= LEFT)
         
         
@@ -211,7 +211,7 @@ class Main_window: # The Main_window class initiates the GUI part of the program
                 self.tree_table. insert ('', END, values = (search['receipt'],search['name'].title(),search['item'].title(),search['quantity']))
         if not self.tree_table.get_children(0): self.tree_table. insert ('', END, values = ('No Results','-','-','-')) #if user search doesnt match anything, tell user there are no search results
 
-    def Double_click (self, event ,selected_receipt): 
+    def Table_selection (self, event ,selected_receipt): 
         '''
         Description: Updates main window to display the order that the user has selected in the advanced search window
         Args: event (var used in the lambda function that is used to run this function),  selected_receipt : dict (dictionary with the values of the receipt data that was selected in the table)
@@ -327,7 +327,8 @@ class Main_window: # The Main_window class initiates the GUI part of the program
         else: # If right button is clicked then shift index up one
             self.index += 1
         self.Receipt_shifting() # Updates the receipt data display to show the new receipt data
-        
+    
+
     def Reset (self):
         '''
         Description: Resets/deletes all the stored data on the JSON file 
@@ -344,7 +345,7 @@ class Main_window: # The Main_window class initiates the GUI part of the program
         
     def Quit (self):
         root.destroy()
-root = Tk()   
-program = Main_window(root)
 
+root = Tk()  
+program = Main_window(root)
 root.mainloop()
