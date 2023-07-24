@@ -7,7 +7,7 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
         '''
         Description: When the Main_window class is run, the __init__ function will automatically run
         Args: root : (Initiates tkinter)
-        Returns: Creates a window on users device and displays all of the GUI elements on the main window
+        Returns: None
         '''
         global style , receipt_data_display, data , receipt_list# lets the variable "style" to be accessed anywhere in the program file, meaning it can be used/modified anywhere in the program code
         with open("storage.json") as file: # Opens the storage.json file and accesses the dictionary in the file
@@ -47,10 +47,10 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
         themes_submenu.add_command(label= "Dark" ,command= lambda :self.Themes("Dark")) # adding a Dark button to the themes submenu. when clicked it changes the program to dark theme
         
         tool_menu.add_separator() 
+    
         
-        reset_submenu = Menu(tool_menu, tearoff= 0) #Adding another submenu to the menubar
-        tool_menu.add_cascade(label="Reset All", menu=reset_submenu ) #Submenu named Reset All
-        reset_submenu.add_command(label = "Confirm", command = self.Reset) #When user clicks on Reset All it opens another button called comfirm, when user presses this button it runs the reset function
+        tool_menu.add_command(label="Clear all data", command= self.Reset ) # When user clicks this button it runs the Reset function 
+        
         
         tool_menu.add_separator()
         tool_menu.add_command(label= "Exit", command= self.Quit) #runs the Quit function when pressed
@@ -264,7 +264,7 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
         Returns: None
         '''
         if len(receipt_list) == 0: 
-            messagebox.showerror("ERROR", "There are no receipts to return") # Messagebox to tell the user about the error
+            messagebox.showerror("Error", "There are no receipts to return") # Messagebox to tell the user about the error
         else:
             confirmation = messagebox.askyesno('Confirmation','Are you sure you want to return this item?')
             if confirmation:
@@ -335,13 +335,15 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
         Args: None
         Returns: None
         '''
-        data = {"orders": [], "receipt_numbers": 0} #Resets the data dictionary to its default, no data state 
-        receipt_list = data['orders']  #Resets receipt_list so nothing is being stored
-        self.index = -1 # Resets index
-        self.page_amount = 0 #Resets page amount
-        receipt_data_display.config(text= f"No receipts\n\n\n\n") #Since there is no data being stored, receipt data display will not be displaying an receipt data
-        self.page_number.config(text = f"{self.index+1} of {self.page_amount}") #Reset page amount to be 0 of 0 
-        with open("storage.json", 'w') as file: json.dump(data, file, indent= 4) #Removing all stored data in the JSON file
+        confirmation = messagebox.askokcancel("Confirmation", "Are you want to clear all currently stored customer data? \n(This action can not be reversed)")
+        if confirmation: 
+            data = {"orders": [], "receipt_numbers": 0} #Resets the data dictionary to its default, no data state 
+            receipt_list = data['orders']  #Resets receipt_list so nothing is being stored
+            self.index = -1 # Resets index
+            self.page_amount = 0 #Resets page amount
+            receipt_data_display.config(text= f"No receipts\n\n\n\n") #Since there is no data being stored, receipt data display will not be displaying an receipt data
+            self.page_number.config(text = f"{self.index+1} of {self.page_amount}") #Reset page amount to be 0 of 0 
+            with open("storage.json", 'w') as file: json.dump(data, file, indent= 4) #Removing all stored data in the JSON file
         
     def Quit (self):
         root.destroy()
