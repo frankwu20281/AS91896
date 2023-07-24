@@ -287,20 +287,23 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
         Args: name : str (the full name that the user has inputed), item : str (the item name that user has inputed), quantity : int (the item quantity that the user has inputed)
         Returns: None
         '''
-        
+        print(str(len(name.split())))
         error_text= '' #Error text that will be displayed using the messagebox 
         self.name_entry.configure(foreground= "black"), self.item_entry.configure(foreground= "black"), self.amount_entry.configure(foreground= "black")
-        if not name.isalpha() or not name: #Error checking for invalid name
+        if not name.replace(" ", "").isalpha() or not name  or int(len(name.split())) > 3: #Error checking for invalid name
             if error_text == '': error_text += " name" #Adding name to the error text
             else: error_text += ", name " 
             self.name_entry.configure(foreground= "red") #Changing the text on the name entrybox to red to show user there is an error there
-        if not item.isalpha() or not item: #Error checking for invalid item name
+        if not item.replace(" ", "").isalpha() or not item: #Error checking for invalid item name
             if error_text == '': error_text += " item name" #Adding item name to the error text
             else: error_text += ", item name" 
             
             self.item_entry.configure(foreground= "red") #Changing the text on the item entrybox to red to show user there is an error there
         if not quantity or not quantity.isdigit() or int(quantity)>500 or int(quantity)<1: #Error checking for invalid item quantity
-            if error_text == '': error_text += " item quantity" #Adding item quantity to the error text
+            if error_text == '':
+                if not quantity.isdigit():error_text += " item quantity (Enter in number form)" # If user entered a word, tell user to enter in number form
+                else: error_text += " item quantity" #Adding item quantity to the error text
+            elif not quantity.isdigit():  error_text += ", item quantity (Enter in number form)" # If user entered a word, tell user to enter in number form
             else: error_text += ", item quantity (1-500)"
             self.amount_entry.configure(foreground= "red") #Changing the text on the quantity entrybox to red to show user there is an error there
         if error_text: #If there are any errors, then display a messagebox that tells the user where the errors are
