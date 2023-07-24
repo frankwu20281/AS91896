@@ -3,10 +3,10 @@ from tkinter import ttk, messagebox # From the tkinter module, the ttk module is
 import json #The 'json' module is imported in order to effectively work with the saved_data.json file for saving reports.
 
 class Main_window: # The Main_window class initiates the GUI part of the program and holds all the functions used in the program
-    def __init__(self,master): 
+    def __init__(self,root): 
         '''
         Description: When the Main_window class is run, the __init__ function will automatically run
-        Args: None
+        Args: root : (Initiates tkinter)
         Returns: Creates a window on users device and displays all of the GUI elements on the main window
         '''
         global style , receipt_data_display, data , receipt_list# lets the variable "style" to be accessed anywhere in the program file, meaning it can be used/modified anywhere in the program code
