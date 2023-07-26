@@ -363,5 +363,5 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
         ROOT.destroy() # Closes program. 
 
 ROOT = Tk() # Initiates tkinter.
-program = Main_window(ROOT) 
+PROGRAM = Main_window(ROOT) 
 ROOT.mainloop() # Runs the program class.
