@@ -3,10 +3,10 @@ from tkinter import ttk, messagebox # From the tkinter module, the ttk module is
 import json # The 'json' module is imported in order to effectively work with the saved_data.json file for saving reports. 
 
 class Main_window(): # The Main_window class initiates the GUI part of the program and holds all the functions used in the program.
-    def __init__(self,root): 
+    def __init__(self,ROOT): 
         '''
         Description: When the Main_window class is run, the __init__ function will automatically run.
-        Args: root : (Initiates tkinter)
+        Args: ROOT : Const (Initiates tkinter)
         Returns: None
         '''
         global style , receipt_data_display, data , receipt_list # Lets the variables "style", "receipt_data_display", "data" and "receipt_list" to be accessed anywhere in the program file, meaning it can be used/modified anywhere in the program code.
@@ -16,14 +16,14 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
         self.index = -1 if not receipt_list else 0  # Counter to keep count what receipt in the list the program currently is displaying/using, start at -1 because 0 is the item in list.
         self.page_amount = len(receipt_list)    # Keep count of the total amount of receipts in the program.
         # Configures the main window.
-        root.title("Receipts") # Changes window title name to "Receipts".
-        root.geometry("700x450") # Sets the main window size when the program first runs.
-        style = ttk.Style(root) # Function that allows the ttk UI elements to be styled.
+        ROOT.title("Receipts") # Changes window title name to "Receipts".
+        ROOT.geometry("700x450") # Sets the main window size when the program first runs.
+        style = ttk.Style(ROOT) # Function that allows the ttk UI elements to be styled.
         style.theme_use("xpnative") # System theme for all of the ttk UI elements. 
         self.theme = "Light" # Sets current theme as light. 
         # Setting up all the styles for fonts/buttons/labels/entryboxes etc. 
-        root.configure(bg= "SystemButtonFace") # Sets background colour of the program to be "SystemButtonFace".
-        style.configure(root, font = ("Arial", 12), background = 'SystemButtonFace', foreground = "black") # Sets the default font to be Arial size 12 and the background of the font to be "SystemButtonFace" and the foreground of the font to be "black".
+        ROOT.configure(bg= "SystemButtonFace") # Sets background colour of the program to be "SystemButtonFace".
+        style.configure(ROOT, font = ("Arial", 12), background = 'SystemButtonFace', foreground = "black") # Sets the default font to be Arial size 12 and the background of the font to be "SystemButtonFace" and the foreground of the font to be "black".
         
         style.configure("main.TFrame", font = (None, 12) , background = "#fbfbfb" ) # Sets the font of the of the frames using "main.TFrame" to be size 12, and setting the background colour to "#fbfbfb".
         style.configure("sub.TFrame", font = (None, 12) , background = "SystemButtonFace" ) # Sets the font of the of the frames using "sub.TFrame" to be size 12, and setting the background colour to "SystemButtonFace".
@@ -34,8 +34,8 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
         padding = {'padx':15, 'pady': 15} # Default external padding values for all of the frames.
         
         # Creating menu bar.
-        menubar = Menu(root)
-        root.config(menu=menubar)
+        menubar = Menu(ROOT)
+        ROOT.config(menu=menubar)
         tool_menu = Menu(menubar, tearoff= 0)
         
         menubar.add_cascade(label="Tools", menu= tool_menu ) # Menubar named "Tools".
@@ -54,11 +54,11 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
         
         tool_menu.add_command(label= "Exit", command= self.Quit) # Runs the Quit function when pressed.
         # Program title and system theme button.
-        ttk.Label(root, text= "Item Hire Tracker" ,  font= ("Arial", 20, 'bold')). pack (pady= 10)
-        self.mode_button = ttk.Button(root, text= "Light Mode", command= lambda :self.Themes("Dark" if self.theme == "Light" else "Light"))
+        ttk.Label(ROOT, text= "Item Hire Tracker" ,  font= ("Arial", 20, 'bold')). pack (pady= 10)
+        self.mode_button = ttk.Button(ROOT, text= "Light Mode", command= lambda :self.Themes("Dark" if self.theme == "Light" else "Light"))
         self.mode_button. pack(anchor= E, padx = 70,   expand= TRUE)
         # Creating 'master' frame to put all ui stuff in.
-        frame = ttk.Frame(root, style= "main.TFrame")
+        frame = ttk.Frame(ROOT, style= "main.TFrame")
         frame.pack( padx= 20,pady= 10, expand= TRUE)
         # Frame with all the user entry UI.
         entry_frame=ttk.LabelFrame(frame, text= "Fill Out", style= "sub.TFrame")
@@ -120,7 +120,7 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
         Returns: None
         '''
         global new_window, search_window_style # Globaling the varables new_window and search_window_style allowing them to be accessed throughout the program.
-        new_window = Toplevel(root)
+        new_window = Toplevel(ROOT)
         # Configuring the new window.
         new_window.title('Advanced Search') # Title of the new window.
         new_window.configure(bg= "SystemButtonFace" if self.theme == "Light" else "#2b2b2b" ) #Setting background colour.
@@ -166,8 +166,8 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
         self.theme  = theme 
         self.mode_button.configure(text= "Dark Mode" if theme== "Dark" else "Light Mode") # Changes text on the theme button to display the current theme that is active. 
         
-        root.configure(bg= "#2b2b2b" if theme == "Dark" else 'SystemButtonFace') # Changes the main window background to match the current theme.
-        style.configure(root, font = ("Arial", 12), foreground = "white" if theme == "Dark" else 'black' 
+        ROOT.configure(bg= "#2b2b2b" if theme == "Dark" else 'SystemButtonFace') # Changes the main window background to match the current theme.
+        style.configure(ROOT, font = ("Arial", 12), foreground = "white" if theme == "Dark" else 'black' 
                             ,background = "#2b2b2b" if theme == 'Dark' else "SystemButtonFace") #Changes the defualt text to match the current theme. 
         style.configure("main.TFrame", font = (None, 12) , background = "#323232" if theme == 'Dark' else "#fbfbfb") # Changes the main frame to match the current theme. 
         style.configure("sub.TFrame", font = (None, 12) , background = "#2b2b2b" if theme == 'Dark' else"SystemButtonFace"  ) # Changes the sub frame to match the current them.e
@@ -357,8 +357,8 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
         Args: None
         Returns: None
         '''
-        root.destroy() # Closes program. 
+        ROOT.destroy() # Closes program. 
 
-root = Tk() # Initiates tkinter.
-program = Main_window(root) 
-root.mainloop() # Runs the program class.
+ROOT = Tk() # Initiates tkinter.
+program = Main_window(ROOT) 
+ROOT.mainloop() # Runs the program class.
