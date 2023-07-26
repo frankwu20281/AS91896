@@ -57,7 +57,7 @@ class MainWindow:
         self.page_number.grid()
 
         Button(master, text= "Buy", command= self.add).grid(row=5, column=0)
-        Button(master, text = "Return", command = self.add).grid(row=5,column=1)
+        Button(master, text = "Return", command = self.delete).grid(row=5,column=1)
         Button(master, text = "quit", command = self.quit).grid(row=8,column=1)
 
 
@@ -88,6 +88,14 @@ class MainWindow:
 
         #item_text = f"{name} - {receipt_number} - {item}({amount})"
         #self.receipt_storage.insert(END, item_text)
+
+    def delete (self):
+        receipt_number = self.receipt_list[self.page]
+        del self.receipt_dict[receipt_number]
+        if len(self.receipt_dict) == 0: 
+            self.receipt_image.config(text= "")
+        else: 
+            self.previous_receipt()
 
     def next_receipt(self): 
         MainWindow.page += 1
