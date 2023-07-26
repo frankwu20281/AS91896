@@ -290,28 +290,31 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
         error_text= '' # Error text that will be displayed using the messagebox. 
         self.first_name_entry.configure(foreground= "black"),self.family_name_entry.configure(foreground= "black"),self.item_entry.configure(foreground= "black"), self.amount_entry.configure(foreground= "black")
         if not first_name.replace(" ", "").isalpha() or not first_name or int(len(first_name.split())) !=1: # Error checking for invalid first name.
-            if error_text == '': error_text += " first name" # Adding first name to the error text.
-            else: error_text += ", first name" 
+            if not first_name: error_text += " first name"  
+            elif not first_name.replace(" ", "").isalpha() : error_text += " first name (No numbers/symbols)" # Error message if there are numbers or symbols. 
+            elif int(len(first_name.split())) !=1 : error_text += " first name (One first name only)" # Error message if there are more than one word.  
             self.first_name_entry.configure(foreground= "red") # Changing the text on the name entrybox to red to show user there is an error there.
         if not family_name.replace(" ", "").isalpha() or not family_name or int(len(family_name.split())) !=1 : # Error checking for invalid family name.
-            if error_text == '': error_text += " family name" # Adding family to the error text.
-            else: error_text += ", family name" 
+            if error_text: error_text += ", " 
+            if not family_name : error_text += " family name"
+            elif not family_name.replace(" ", "").isalpha() : error_text += " family name (No numbers/symbols)" # Error message if there are numbers or symbols. 
+            elif int(len(family_name.split())) !=1 : error_text += " family name (One family name only)" # Error message if there are more than one word.   
             self.family_name_entry.configure(foreground= "red") # Changing the text on the name entrybox to red to show user there is an error there.
         if not item.replace(" ", "").isalpha() or not item: # Error checking for invalid item name.
-            if error_text == '': error_text += " item name" # Adding item name to the error text.
-            else: error_text += ", item name" 
-            
+            if error_text: error_text += ", "
+            if not item : error_text += " item name"
+            elif not item.replace(" ", "").isalpha(): error_text += " item name (No numbers/symbols)" # Error message if there are numbers or symbols. 
             self.item_entry.configure(foreground= "red") # Changing the text on the item entrybox to red to show user there is an error there.
         if not quantity or not quantity.isdigit() or int(quantity)>500 or int(quantity)<1: # Error checking for invalid item quantity.
-            if error_text == '':
-                if not quantity.isdigit():error_text += " item quantity (Enter in number form)" # If user entered a word, tell user to enter in number form.
-                elif int(quantity)>500 or int(quantity)<1: error_text += ", item quantity (1-500)" # Adding item quantity to the error text.
-            elif not quantity.isdigit():  error_text += ", item quantity (Enter in number form)" # If user entered a word, tell user to enter in number form.
-            elif int(quantity)>500 or int(quantity)<1: error_text += ", item quantity (1-500)"
+            if error_text : error_text += ", "
+            if not quantity : error_text += " item quantity"
+            elif not quantity.replace(" ", "").isdigit():  error_text += " item quantity (No words/symbols)" # Error message if there are words or symbols. 
+            elif len(quantity)>1: error_text += " item quantity (One number only)" # Error message if user types in more than one number.
+            elif int(quantity)>500 or int(quantity)<1: error_text += " item quantity (1-500)" # Error message if user types a number smaller/larger than the range.
             self.amount_entry.configure(foreground= "red") # Changing the text on the quantity entrybox to red to show user there is an error there.
         if error_text: # If there are any errors, then display a messagebox that tells the user where the errors are.
-            messagebox.showerror("Error", f"Invalid{error_text}")
-            
+            messagebox.showerror("Error", f"Invalid{error_text}.")
+          
         else: # If there aren't any errors, put the users data into a dictonary format and put that dictonary into the receipt_list.
             data["receipt_numbers"] += 1  # Increasing the receipt_numbers value by one in the JSON file to not let receipts have the same receipt number.
             receipt_list.append({"receipt": data["receipt_numbers"] , "name": str(first_name+" "+family_name), "item": item, "quantity": quantity}) # Adding the data to receipt_list in a dictonary form.
@@ -360,5 +363,5 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
         ROOT.destroy() # Closes program. 
 
 ROOT = Tk() # Initiates tkinter.
-PROGRAM = Main_window(ROOT) 
+program = Main_window(ROOT) 
 ROOT.mainloop() # Runs the program class.
