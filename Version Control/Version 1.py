@@ -1,8 +1,6 @@
 from tkinter import * 
 from tkinter import messagebox
-
 import random
-
 
 class MainWindow: 
     receipt_list = []
@@ -11,9 +9,6 @@ class MainWindow:
     page_amount = 0 
     def __init__(self, master):
         self.master = master 
-        
-        
-
 
         Label(master,text= 'Store').grid(row=0, column=0, columnspan= 2)
          
@@ -37,11 +32,6 @@ class MainWindow:
         self.amount_label.grid(row=4, column= 0)
         self.amount_entry = Entry(master)
         self.amount_entry. grid (row=4, column=1)
-
-
-        #self.receipt_storage = Listbox(master)
-        #self.receipt_storage.grid(columnspan= 2)
-
         
         self.receipt_image = Label(master, text="")
         self.receipt_image.grid(row= 6, column=0, columnspan= 2)
@@ -59,8 +49,6 @@ class MainWindow:
         Button(master, text= "Buy", command= self.add).grid(row=5, column=0)
         Button(master, text = "Return", command = self.delete).grid(row=5,column=1)
         Button(master, text = "quit", command = self.quit).grid(row=8,column=1)
-
-
         
     def add(self): 
         name = self.name_entry.get()
@@ -69,8 +57,7 @@ class MainWindow:
         receipt = self.receipt_entry.get()
         
         while True: 
-            
-            
+                   
             if receipt in MainWindow.receipt_list:
                 messagebox.showerror("error", "enter different receipt number")
                 break
@@ -85,9 +72,6 @@ class MainWindow:
                 print(MainWindow.page)
                 self.page_number.config(text = f"{MainWindow.page+1} of {MainWindow.page_amount}")
                 break 
-
-        #item_text = f"{name} - {receipt_number} - {item}({amount})"
-        #self.receipt_storage.insert(END, item_text)
 
     def delete (self):
         receipt_number = self.receipt_list[self.page]
@@ -112,9 +96,7 @@ class MainWindow:
         
     
     def previous_receipt(self): 
-        MainWindow.page -= 1
-        
-        
+        MainWindow.page -= 1    
         receipt_number = MainWindow.receipt_list[MainWindow.page]
         print(receipt_number)
         receipt_list = MainWindow.receipt_dict[receipt_number]
@@ -124,14 +106,10 @@ class MainWindow:
 
         self.receipt_image.config(text= f"Store\n reciept: {receipt_number} \nname: {receipt_list[0]}\n item: {receipt_list[1]}\n amount:{receipt_list[2]}")
 
-    
-
     def quit (self):
         root.destroy()
-
+   
     
-       
-
 root = Tk()   
 program = MainWindow(root)
 root.mainloop()
