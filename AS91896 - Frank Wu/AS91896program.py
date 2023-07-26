@@ -56,7 +56,7 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
         tool_menu.add_command(label= "Exit", command= self.Quit) #runs the Quit function when pressed
         #Program title and system theme button 
         ttk.Label(root, text= "Item Hire Tracker" ,  font= ("Arial", 20, 'bold')). pack (pady= 10)
-        self.mode_button = ttk.Button(root, text= "Light theme", command= lambda :self.Themes("Dark" if self.theme == "Light" else "Light"))
+        self.mode_button = ttk.Button(root, text= "Light Mode", command= lambda :self.Themes("Dark" if self.theme == "Light" else "Light"))
         self.mode_button. pack(anchor= E, padx = 70,   expand= TRUE)
         #Creating 'master' frame to put all ui stuff in
         frame = ttk.Frame(root, style= "main.TFrame")
@@ -64,23 +64,28 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
         #Frame with all the user entry ui 
         entry_frame=ttk.LabelFrame(frame, text= "Fill Out", style= "sub.TFrame")
         entry_frame.pack(side= LEFT, fill= BOTH, **padding) 
-        #Label that asks user to input full name, and entrybox to let user input
-        self.name_label = ttk.Label(entry_frame, text= "enter full name").grid(row=0, column=0, pady= 5, padx= 5)
-        self.name_entry = ttk.Entry(entry_frame)
-        self.name_entry.grid(row=0, column=1, pady= 5, padx= 5)
+        #Label that asks user to input first name, and entrybox to let user input
+        self.first_name_label = ttk.Label(entry_frame, text= "Enter first name").grid(row=0, column=0, pady= 5, padx= 5, sticky= W)
+        self.first_name_entry = ttk.Entry(entry_frame)
+        self.first_name_entry.grid(row=0, column=1, pady= 5, padx= 5)
+        #Label that asks user to input family name, and entrybox to let user input
+        self.family_name_label = ttk.Label(entry_frame, text= "Enter family name").grid(row=1, column=0, pady= 5, padx= 5, sticky= W)
+        self.family_name_entry = ttk.Entry(entry_frame)
+        self.family_name_entry.grid(row=1, column=1, pady= 5, padx= 5)
         #Label that asks user to input item name, and entrybox to let user input
-        self.item_label = ttk.Label(entry_frame, text= "enter item name").grid(row=1, column= 0, pady= 5, padx= 5)
+        self.item_label = ttk.Label(entry_frame, text= "Enter item ").grid(row=2, column= 0, pady= 5, padx= 5, sticky= W)
         self.item_entry = ttk.Entry(entry_frame)
-        self.item_entry.grid(row=1, column=1, pady= 5, padx= 5)
+        self.item_entry.grid(row=2, column=1, pady= 5, padx= 5)
         #Label that asks user to input item amount, and entrybox to let user input
-        self.amount_label = ttk.Label(entry_frame, text= "enter item quantity").grid(row=2, column= 0, pady= 5, padx= 5)    
+        self.amount_label = ttk.Label(entry_frame, text= "Enter item quantity").grid(row=3, column= 0, pady= 5, padx= 5, sticky= W)    
         self.amount_entry = ttk.Entry(entry_frame)
-        self.amount_entry.grid (row=2, column=1, pady= 5, padx= 5)
+        self.amount_entry.grid (row=3, column=1, pady= 5, padx= 5)
         #Buy button that runs the Add function when pressed
-        ttk.Button(entry_frame, text= "Hire", command= lambda : self.Add(self.name_entry.get().strip().lower(),self.item_entry.get().strip().lower()
-                , self.amount_entry.get().strip().lower()), style= "big.TButton").grid(row=3, column=1, pady= 5)
+        ttk.Button(entry_frame, text= "Hire", command= lambda : self.Add(self.first_name_entry.get().strip().lower(),
+                self.family_name_entry.get().strip().lower(),self.item_entry.get().strip().lower()
+                , self.amount_entry.get().strip().lower()), style= "big.TButton").grid(row=4, column=1, pady= 5)
         #Return button that runs the Delete function when pressed
-        ttk.Button(entry_frame, text = "Return", command = self.Delete).grid(row=3,column=0, pady= 5)
+        ttk.Button(entry_frame, text = "Return", command = self.Delete).grid(row=4,column=0, pady= 5)
         # Frame with the receipt search bar 
         search_frame = ttk.LabelFrame(frame, text= "Search Receipt Number", style= "sub.TFrame")
         search_frame.pack(fill= X ,**padding)
@@ -203,21 +208,26 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
         Args: typed : str (the text that the user has typed in the search bar)
         Returns: None
         '''  
-        for row in self.tree_table.get_children(): self.tree_table.delete(row)           
+        
+        self.tree_table.bind('<<TreeviewSelect>>', lambda event: self.Table_selection(self,self.tree_table.item(self.tree_table.selection())))
+       
+        for row in self.tree_table.get_children(): self.tree_table.delete(row)         
         for search in receipt_list:  #seeing if user search matches anything in receipt list
             if typed == "":     #if user has typed nothing then display all receipts in listbox 
                 self.tree_table. insert ('', END, values = (search['receipt'],search['name'].title(),search['item'].title(),search['quantity']))
             elif typed.lower() in str(search['receipt']) or typed.lower() in search['name'] or typed.lower() in search['item']or typed.lower() in search['quantity']:   # if user has typed something and it matches something in a receipt, display it in listbox
                 self.tree_table. insert ('', END, values = (search['receipt'],search['name'].title(),search['item'].title(),search['quantity']))
-        if not self.tree_table.get_children(0): self.tree_table. insert ('', END, values = ('No Results','-','-','-')) #if user search doesnt match anything, tell user there are no search results
-
+        if not self.tree_table.get_children(0): 
+            self.tree_table. insert ('', END, values = ('No Results','-','-','-')) #if user search doesnt match anything, tell user there are no search results
+            self.tree_table.unbind('<<TreeviewSelect>>') 
     def Table_selection (self, event ,selected_receipt): 
         '''
         Description: Updates main window to display the order that the user has selected in the advanced search window
         Args: event (var used in the lambda function that is used to run this function),  selected_receipt : dict (dictionary with the values of the receipt data that was selected in the table)
         '''
          #gets the string that the user has selected 
-        self.index = next((self.index for (self.index, dict) in enumerate(receipt_list) if dict["receipt"] == selected_receipt['values'][0]), None) #searches for the dictionary that matches the receipt number, then finds the self.index of that dictionary in the receipt_list list
+        try:self.index = next((self.index for (self.index, dict) in enumerate(receipt_list) if dict["receipt"] == selected_receipt['values'][0]), None) #searches for the dictionary that matches the receipt number, then finds the self.index of that dictionary in the receipt_list list
+        except: pass 
         self.Receipt_shifting() #updates the main window to display the order
     
     def Receipt_number_search (self, search_field ): #function to search for orders using receipt number
@@ -281,19 +291,22 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
                         try: self.All_search( self.adv_search_entry.get().strip()) # If the advanced search window is open, update the table to remove the deleted receipt data
                         except: pass      
     
-    def Add(self, name, item, quantity): 
+    def Add(self, first_name, family_name, item, quantity): 
         '''
         Description: Checks if there are errors in users order input, if not then adds user's inputed data to the JSON file. If there are errors a error message window will open telling user about the error/s
-        Args: name : str (the full name that the user has inputed), item : str (the item name that user has inputed), quantity : int (the item quantity that the user has inputed)
+        Args: first_name : str (the first name that the user has inputed), family_name: str (the family name taht the user has inputed) item : str (the item name that user has inputed), quantity : int (the item quantity that the user has inputed)
         Returns: None
         '''
-        print(str(len(name.split())))
         error_text= '' #Error text that will be displayed using the messagebox 
-        self.name_entry.configure(foreground= "black"), self.item_entry.configure(foreground= "black"), self.amount_entry.configure(foreground= "black")
-        if not name.replace(" ", "").isalpha() or not name  or int(len(name.split())) > 3: #Error checking for invalid name
-            if error_text == '': error_text += " name" #Adding name to the error text
-            else: error_text += ", name " 
-            self.name_entry.configure(foreground= "red") #Changing the text on the name entrybox to red to show user there is an error there
+        self.first_name_entry.configure(foreground= "black"),self.family_name_entry.configure(foreground= "black"),self.item_entry.configure(foreground= "black"), self.amount_entry.configure(foreground= "black")
+        if not first_name.replace(" ", "").isalpha() or not first_name or int(len(first_name.split())) !=1: #Error checking for invalid first name
+            if error_text == '': error_text += " first name" #Adding first name to the error text
+            else: error_text += ", first name" 
+            self.first_name_entry.configure(foreground= "red") #Changing the text on the name entrybox to red to show user there is an error there
+        if not family_name.replace(" ", "").isalpha() or not family_name or int(len(family_name.split())) !=1 : #Error checking for invalid family name
+            if error_text == '': error_text += " family name" #Adding family to the error text
+            else: error_text += ", family name" 
+            self.family_name_entry.configure(foreground= "red") #Changing the text on the name entrybox to red to show user there is an error there
         if not item.replace(" ", "").isalpha() or not item: #Error checking for invalid item name
             if error_text == '': error_text += " item name" #Adding item name to the error text
             else: error_text += ", item name" 
@@ -302,20 +315,20 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
         if not quantity or not quantity.isdigit() or int(quantity)>500 or int(quantity)<1: #Error checking for invalid item quantity
             if error_text == '':
                 if not quantity.isdigit():error_text += " item quantity (Enter in number form)" # If user entered a word, tell user to enter in number form
-                else: error_text += " item quantity" #Adding item quantity to the error text
+                elif int(quantity)>500 or int(quantity)<1: error_text += ", item quantity (1-500)" #Adding item quantity to the error text
             elif not quantity.isdigit():  error_text += ", item quantity (Enter in number form)" # If user entered a word, tell user to enter in number form
-            else: error_text += ", item quantity (1-500)"
+            elif int(quantity)>500 or int(quantity)<1: error_text += ", item quantity (1-500)"
             self.amount_entry.configure(foreground= "red") #Changing the text on the quantity entrybox to red to show user there is an error there
         if error_text: #If there are any errors, then display a messagebox that tells the user where the errors are
             messagebox.showerror("Error", f"Invalid{error_text}")
             
         else: #If there aren't any errors, put the users data into a dictonary format and put that dictonary into the receipt_list
             data["receipt_numbers"] += 1  #Increasing the receipt_numbers value by one in the JSON file to not let receipts have the same receipt number
-            receipt_list.append({"receipt": data["receipt_numbers"] , "name": name, "item": item, "quantity": quantity}) #Adding the data to receipt_list in a dictonary form
+            receipt_list.append({"receipt": data["receipt_numbers"] , "name": str(first_name+" "+family_name), "item": item, "quantity": quantity}) #Adding the data to receipt_list in a dictonary form
             self.page_amount += 1 #Increasing the page amount by one since we have added one receipt data to receipt_list
             self.index = 0 if self.index == -1 else self.page_amount - 1 #Changes the index to match where the newly added receipt data is placed in receipt_list
             with open("storage.json", 'w') as file: json.dump(data, file, indent= 4) #Adds the updated receipt_list and receipt_numbers to the JSON file
-            self.name_entry.delete(0,END),self.item_entry.delete(0,END),self.amount_entry.delete(0,END) # Deletes the text in all of the entryboxes 
+            self.first_name_entry.delete(0,END),self.family_name_entry.delete(0, END),self.item_entry.delete(0,END),self.amount_entry.delete(0,END) # Deletes the text in all of the entryboxes 
             self.Receipt_shifting() # Run the Receipt_shifting function to update the display window to show the newly added receipt data 
             try: self.All_search( self.adv_search_entry.get().strip()) # If advanced window is open, update the table to also show the newly added receipt data
             except: pass 
