@@ -39,23 +39,23 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
         tool_menu = Menu(menubar, tearoff= 0)
         
         menubar.add_cascade(label="Tools", menu= tool_menu ) # Menubar named "Tools".
-        tool_menu.add_command(label="Advanced Search", command= self.Search_window) # Adding a Advanced Search button to the menubar, when clicked it runs the Search_window function.
+        tool_menu.add_command(label="Advanced Search", command= self.search_window) # Adding a Advanced Search button to the menubar, when clicked it runs the search_window function.
         
         themes_submenu = Menu(tool_menu, tearoff= 0) # Adding a submenu to the menubar.
         tool_menu.add_cascade(label="Themes", menu= themes_submenu) #Submemu named Themes.
-        themes_submenu.add_command(label= "Light" ,command= lambda :self.Themes("Light")) # Adding a Light button to the themes submenu, when clicked it changes the program to light theme.
-        themes_submenu.add_command(label= "Dark" ,command= lambda :self.Themes("Dark")) # adding a Dark button to the themes submenu. when clicked it changes the program to dark theme.
+        themes_submenu.add_command(label= "Light" ,command= lambda :self.themes("Light")) # Adding a Light button to the themes submenu, when clicked it changes the program to light theme.
+        themes_submenu.add_command(label= "Dark" ,command= lambda :self.themes("Dark")) # adding a Dark button to the themes submenu. when clicked it changes the program to dark theme.
         
         tool_menu.add_separator() 
 
-        tool_menu.add_command(label="Clear all data", command= self.Reset ) # When user clicks this button it runs the Reset function. 
+        tool_menu.add_command(label="Clear all data", command= self.reset ) # When user clicks this button it runs the reset function. 
         
         tool_menu.add_separator()
         
-        tool_menu.add_command(label= "Exit", command= self.Quit) # Runs the Quit function when pressed.
+        tool_menu.add_command(label= "Exit", command= self.quit) # Runs the quit function when pressed.
         # Program title and system theme button.
         ttk.Label(ROOT, text= "Item Hire Tracker" ,  font= ("Arial", 20, 'bold')). pack (pady= 10)
-        self.mode_button = ttk.Button(ROOT, text= "Light Mode", command= lambda :self.Themes("Dark" if self.theme == "Light" else "Light"))
+        self.mode_button = ttk.Button(ROOT, text= "Light Mode", command= lambda :self.themes("Dark" if self.theme == "Light" else "Light"))
         self.mode_button. pack(anchor= E, padx = 70,   expand= TRUE)
         # Creating 'master' frame to put all ui stuff in.
         frame = ttk.Frame(ROOT, style= "main.TFrame")
@@ -66,33 +66,33 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
         # Label that asks user to input first name, and entrybox to let user input.
         self.first_name_label = ttk.Label(entry_frame, text= "Enter first name").grid(row=0, column=0, pady= 5, padx= 5, sticky= W)
         self.first_name_entry = ttk.Entry(entry_frame)
-        self.first_name_entry.grid(row=0, column=1, pady= 5, padx= 5)
+        self.first_name_entry.grid(row=0, column=1, pady= 5, padx= 5, ipadx= 10)
         # Label that asks user to input family name, and entrybox to let user input.
         self.family_name_label = ttk.Label(entry_frame, text= "Enter family name").grid(row=1, column=0, pady= 5, padx= 5, sticky= W)
         self.family_name_entry = ttk.Entry(entry_frame)
-        self.family_name_entry.grid(row=1, column=1, pady= 5, padx= 5)
+        self.family_name_entry.grid(row=1, column=1, pady= 5, padx= 5, ipadx= 10)
         # Label that asks user to input item name, and entrybox to let user input.
         self.item_label = ttk.Label(entry_frame, text= "Enter item ").grid(row=2, column= 0, pady= 5, padx= 5, sticky= W)
-        self.item_entry = ttk.Entry(entry_frame)
+        self.item_entry = ttk.Combobox(entry_frame, values= ["Balloons","Cakes","Cupcakes","Party Streamers", "Party Poppers","Juice Boxes","Lolly Bags"], state= "readonly" )
         self.item_entry.grid(row=2, column=1, pady= 5, padx= 5)
         # Label that asks user to input item amount, and entrybox to let user input.
         self.amount_label = ttk.Label(entry_frame, text= "Enter item quantity").grid(row=3, column= 0, pady= 5, padx= 5, sticky= W)    
         self.amount_entry = ttk.Entry(entry_frame)
-        self.amount_entry.grid (row=3, column=1, pady= 5, padx= 5)
-        # Buy button that runs the Add function when pressed.
-        ttk.Button(entry_frame, text= "Hire", command= lambda : self.Add(self.first_name_entry.get().strip().lower(),
+        self.amount_entry.grid (row=3, column=1, pady= 5, ipadx= 10)
+        # Buy button that runs the add function when pressed.
+        ttk.Button(entry_frame, text= "Hire", command= lambda : self.add(self.first_name_entry.get().strip().lower(),
                 self.family_name_entry.get().strip().lower(),self.item_entry.get().strip().lower()
                 , self.amount_entry.get().strip().lower()), style= "big.TButton").grid(row=4, column=1, pady= 5)
-        # Return button that runs the Delete function when pressed.
-        ttk.Button(entry_frame, text = "Return", command = self.Delete).grid(row=4,column=0, pady= 5)
+        # Return button that runs the delete function when pressed.
+        ttk.Button(entry_frame, text = "Return", command = self.delete).grid(row=4,column=0, pady= 5)
         # Frame with the receipt search bar. 
         search_frame = ttk.LabelFrame(frame, text= "Search Receipt Number", style= "sub.TFrame")
         search_frame.pack(fill= X ,**padding)
         # Label and entrybox to let user search the receipts/orders by inputing receipt number.
         ttk.Label(search_frame,text="Receipt:").pack(side=LEFT, padx= 5)
         self.search_entry = ttk.Entry(search_frame)
-        # When user releases any key (eg. finishes typing) it will run the Receipt_number_search function.
-        self.search_entry.bind("<KeyRelease>", (lambda event: self.Receipt_number_search(self.search_entry.get())))
+        # When user releases any key (eg. finishes typing) it will run the receipt_number_search function.
+        self.search_entry.bind("<KeyRelease>", (lambda event: self.receipt_number_search(self.search_entry.get())))
         self.search_entry.pack(side= LEFT, expand= TRUE, fill=X, padx = 5 , pady= 5)
         # Frame with the receipt display UI, 
         display_frame=ttk.LabelFrame(frame, text= "Receipt Display", style= "sub.TFrame")
@@ -102,18 +102,18 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
         receipt_data_display = ttk.Label(display_frame, text="No receipts\n\n\n\n")
         receipt_data_display.pack( anchor= CENTER,expand= TRUE, pady= 5)
         # Button to open search window that displays the reciept data in a table format and has all search.
-        ttk.Button(display_frame, text= "Search All", command= self.Search_window).pack( anchor= CENTER,expand= TRUE, ipadx= 10)
+        ttk.Button(display_frame, text= "Search All", command= self.search_window).pack( anchor= CENTER,expand= TRUE, ipadx= 10)
         # Navagation buttons for user to change the currently displayed receipt data.
-        self.back = ttk.Button(display_frame, text="←", command= lambda  :self.Navagation_buttons("left"), state= DISABLED) # Go to next receipt data
+        self.back = ttk.Button(display_frame, text="←", command= lambda  :self.navagation_buttons("left"), state= DISABLED) # Go to next receipt data
         self.back.pack( side= LEFT, expand= TRUE ,anchor= CENTER, pady=10, padx= 5)
         self.page_number = ttk.Label(display_frame, text= f"{self.index+1} of {self.page_amount}") # The page number of the receipt that is currently being displayed.
         self.page_number.pack(side= LEFT, expand= TRUE,  anchor= CENTER)
-        self.forward = ttk.Button(display_frame, text= "→", command=lambda  : self.Navagation_buttons("right"), state= DISABLED) # Go to previous receipt data.
+        self.forward = ttk.Button(display_frame, text= "→", command=lambda  : self.navagation_buttons("right"), state= DISABLED) # Go to previous receipt data.
         self.forward.pack( side= LEFT, expand= TRUE ,anchor= CENTER, pady=10, padx= 5)
         
-        if receipt_list: self.Receipt_shifting() # Checks if program started with any preloaded infomation in the order list, and updates the program to show this info.
+        if receipt_list: self.receipt_shifting() # Checks if program started with any preloaded infomation in the order list, and updates the program to show this info.
                    
-    def Search_window (self):  
+    def search_window (self):  
         '''
         Description: Opens a new window that has the table view ui and the searchbar where you can search through all the data.
         Args: None
@@ -134,31 +134,31 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
         ttk.Label(new_window, text= 'Search for anything and click to display on main window:').pack()
         # Entry box for user to enter their search, binded to keyrelease so program will run search_choice function every time user stops typing.  
         self.adv_search_entry = ttk.Entry(new_window)
-        self.adv_search_entry.bind ("<KeyRelease>", lambda event: self.All_search( self.adv_search_entry.get().strip()))
+        self.adv_search_entry.bind ("<KeyRelease>", lambda event: self.all_search( self.adv_search_entry.get().strip()))
         self.adv_search_entry.pack(padx= 10, fill= X)
         # Treeview table to display all of the programs stored receipt data, and scrollbar for the table. 
         scrollbar = Scrollbar(new_window)
         # Treeview table that displays receipt data. 
         self.tree_table = ttk.Treeview(new_window, columns=('Receipt', 'Name', 'Item', 'Quantity'), show = 'headings',yscrollcommand = scrollbar.set)
-        self.tree_table.bind('<<TreeviewSelect>>', (lambda event: self.Table_selection(self,self.tree_table.item(self.tree_table.selection()))))
+        self.tree_table.bind('<<TreeviewSelect>>', (lambda event: self.table_selection(self,self.tree_table.item(self.tree_table.selection()))))
         self.tree_table.pack(pady= 10, padx=10, fill= BOTH, expand= TRUE, side= LEFT) 
         # First column for the table, Receipt number. 
-        self.tree_table.heading('Receipt', text = "Receipt Number", command= lambda: self.Sorting('Receipt', False if self.sort_direction  else True))
+        self.tree_table.heading('Receipt', text = "Receipt Number", command= lambda: self.sorting('Receipt', False if self.sort_direction  else True))
         self.tree_table.column('Receipt', anchor='center', minwidth=50)
         # Second column for the table, Full name. 
-        self.tree_table.heading('Name', text = "Full Name", command= lambda: self.Sorting('Name', False if self.sort_direction else True))
+        self.tree_table.heading('Name', text = "Full Name", command= lambda: self.sorting('Name', False if self.sort_direction else True))
         self.tree_table.column('Name', anchor='center', minwidth=50)
         # Third column for the table, Item.
-        self.tree_table.heading('Item', text = "Item", command= lambda: self.Sorting('Item', False if self.sort_direction else True))
+        self.tree_table.heading('Item', text = "Item", command= lambda: self.sorting('Item', False if self.sort_direction else True))
         self.tree_table.column('Item', anchor='center', minwidth=50)
         # Forth column for the table, Quantity.
-        self.tree_table.heading('Quantity', text = "Quantity", command= lambda: self.Sorting('Quantity', False if self.sort_direction else True))
+        self.tree_table.heading('Quantity', text = "Quantity", command= lambda: self.sorting('Quantity', False if self.sort_direction else True))
         self.tree_table.column('Quantity', anchor='center', minwidth=50)
         # Putting the table onto the window.    
-        self.All_search(self.adv_search_entry.get().strip()) # Running the All_search function to populate the table with all the users data.
+        self.all_search(self.adv_search_entry.get().strip()) # Running the all_search function to populate the table with all the users data.
 
 
-    def Themes (self, theme ): 
+    def themes (self, theme ): 
         '''
         Description: Controls the colour scheme of the whole program, including the main window and any subwindows.
         Args: theme : str (colour theme that the program is switching to)
@@ -178,7 +178,7 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
             new_window.configure(bg= "SystemButtonFace" if theme == "Light" else "#2b2b2b" ) # Changes the search window background to match the current theme.
         except: pass 
 
-    def Sorting (self, selected, sort_direction): 
+    def sorting (self, selected, sort_direction): 
         ''' 
         Description: When user clicks on the header of a column it will sort the currently displayed receipt data in an ascending/descending order according to that columns data.
         Args: 
@@ -189,30 +189,30 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
         # Stores all of the currently displayed data of the column that was currently selected and its respective position on the table (repersented as a ID code) as a tuple that is stored in a list called "receipt_data".
         receipt_data = [(int(self.tree_table.set(child, selected))if selected == "Receipt" or selected == "Quantity" else (self.tree_table.set(child, selected) ), child) for child in self.tree_table.get_children('')]
         receipt_data.sort(reverse= sort_direction) # Sorts the data list depending on what sort_direction is.
-        for self.index, (value, child) in enumerate(data):self.tree_table.move(child,  '',self.index) #For every tuple in data, move the row assigned to the ID code to its new, sorted postion on the table.
+        for self.index, (value, child) in enumerate(receipt_data):self.tree_table.move(child,  '',self.index) #For every tuple in data, move the row assigned to the ID code to its new, sorted postion on the table.
         for column in self.tree_table['columns']: # Adds an arrow next to the selected column that is currently selected to show what direction the data in that column has been sorted in(ascending/descending).
             if column != selected:self.tree_table.heading(column, text=column)
             else: 
                 arrow = '↓' if  sort_direction else '↑' 
                 self.tree_table.heading(column, text=f'{column} {arrow}') # Displays a arrow icon next to the column header that is getting sorted, with the arrow direction indicating if it is being sorted ascending or descending. 
         
-    def All_search(self, typed):   
+    def all_search(self, typed):   
         '''
         Description: Lets user search for words that are in the currently displayed receipt data in the table 
         Args: typed : str (the text that the user has typed in the search bar)
         '''  
-        self.tree_table.bind('<<TreeviewSelect>>', lambda event: self.Table_selection(self,self.tree_table.item(self.tree_table.selection()))) # Un-disables the Table_select function. 
+        self.tree_table.bind('<<TreeviewSelect>>', lambda event: self.table_selection(self,self.tree_table.item(self.tree_table.selection()))) # Un-disables the Table_select function. 
         for row in self.tree_table.get_children(): self.tree_table.delete(row)         
         for search in receipt_list:  # Seeing if user search matches anything in receipt list.
             if typed == "":     # If user has typed nothing then display all receipts in listbox,
                 self.tree_table. insert ('', END, values = (search['receipt'],search['name'].title(),search['item'].title(),search['quantity']))
             elif typed.lower() in str(search['receipt']) or typed.lower() in search['name'] or typed.lower() in search['item']or typed.lower() in search['quantity']:   # If user has typed something and it matches something in a row's receipt data, display it in listbox.
                 self.tree_table. insert ('', END, values = (search['receipt'],search['name'].title(),search['item'].title(),search['quantity']))
-        if not self.tree_table.get_children(0): # If there is no receipt data that matches the user's search, then display the text "No results" and disable Table_selection function.
+        if not self.tree_table.get_children(0): # If there is no receipt data that matches the user's search, then display the text "No results" and disable table_selection function.
             self.tree_table. insert ('', END, values = ('No Results','-','-','-')) # If user search doesnt match anything, tell user there are no search results.
-            self.tree_table.unbind('<<TreeviewSelect>>') # Disables Table_selection function.
+            self.tree_table.unbind('<<TreeviewSelect>>') # Disables table_selection function.
             
-    def Table_selection (self, event ,selected_receipt): 
+    def table_selection (self, event ,selected_receipt): 
         '''
         Description: Updates main window to display the order that the user has selected in the advanced search window.
         Args: event (var used in the lambda function that is used to run this function),  selected_receipt : dict (dictionary with the values of the receipt data that was selected in the table)
@@ -220,9 +220,9 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
          # Gets the string that the user has selected.
         try:self.index = next((self.index for (self.index, dict) in enumerate(receipt_list) if dict["receipt"] == selected_receipt['values'][0]), None) # Searches for the dictionary that matches the receipt number, then finds the self.index of that dictionary in the receipt_list list.
         except: pass 
-        self.Receipt_shifting() # Updates the main window to display the order.
+        self.receipt_shifting() # Updates the main window to display the order.
     
-    def Receipt_number_search (self, search_field ):
+    def receipt_number_search (self, search_field ):
         '''
         Description: Searches the receipt data list for a receipt that matches the users input.
         Args: search_field : str (the text that the user has typed into the search bar)
@@ -233,17 +233,17 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
             except ValueError: # If user has entered a phrase the searchbar text will turn red, indicating an error. 
                 self.search_entry.config(foreground= 'red')
                 pass 
-            else: # If user receipt number imput matches a value of "receipt" key in the dictionary, it finds the index of the dictionary in the receipt_list list and then runs the Receipt_shifting funciton to update the main window to display the order.
+            else: # If user receipt number imput matches a value of "receipt" key in the dictionary, it finds the index of the dictionary in the receipt_list list and then runs the receipt_shifting funciton to update the main window to display the order.
                 if search_field == dicts['receipt']: 
                     self.index = next((self.index for (self.index, dict) in enumerate(receipt_list) if dict["receipt"] == search_field), None)
                     self.search_entry.config(foreground= 'black')
-                    self.Receipt_shifting() 
+                    self.receipt_shifting() 
                     break
                 else: # If the users input matches none of the receipts in the receipt_list, then change the searchbar's text to red to indicate an error to the user.
                     self.search_entry.config(foreground= 'red')
         
                     
-    def Receipt_shifting (self):
+    def receipt_shifting (self):
         '''
         Description: Uses the current value of self.index to update the main window receipt data display label to show the current receipt data by using the index to search receipt_list 
         for the data dictonary for that receipt/order.
@@ -253,11 +253,11 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
         self.page_number.config(text= f"{self.index+1} of {self.page_amount}") # Updates the page number to show where the order is in the receipt_list.
         # Updates the receipt_data_display Label on the main window to display the current order. 
         receipt_data_display.config(text= f"Name: {receipt_order['name'].title()}\nReciept: #{str(receipt_order['receipt']).zfill(6)}\nItem: {receipt_order['item'].title()}\nQuantity: {receipt_order['quantity']}") 
-        # Updates Navagation_buttons buttons according to the position of the displayed order in the receipt_list. 
+        # Updates navagation_buttons buttons according to the position of the displayed order in the receipt_list. 
         self.forward.config(state= DISABLED if self.page_amount == 1 and self.index ==0 or self.index+1 == self.page_amount else ACTIVE)
         self.back.config(state= DISABLED if self.page_amount == 1 and self.index ==0  or self.index == 0 else ACTIVE)
         
-    def Delete (self): 
+    def delete (self): 
         '''
         Description: Deletes the current order that is being displayed on the mainwindow from self.receipt_list.
         Args: None 
@@ -276,12 +276,12 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
                     if self.page_amount == 0: # If after deleting the receipt, if there is no receipts left to display, change the label to "No Receipts".
                         receipt_data_display.config(text= f"No Receipts\n\n\n\n")
                         self.page_number.config(text = f"{self.index+1} of {self.page_amount}")
-                    else: # If after deleting there are still receipts to display, run the Receipt_shifting function to display the new receipt data.
-                        self.Receipt_shifting()
-                        try: self.All_search( self.adv_search_entry.get().strip()) # If the advanced search window is open, update the table to remove the deleted receipt data.
+                    else: # If after deleting there are still receipts to display, run the receipt_shifting function to display the new receipt data.
+                        self.receipt_shifting()
+                        try: self.all_search( self.adv_search_entry.get().strip()) # If the advanced search window is open, update the table to remove the deleted receipt data.
                         except: pass      
     
-    def Add(self, first_name, family_name, item, quantity): 
+    def add(self, first_name, family_name, item, quantity): 
         '''
         Description: Checks if there are errors in users order input, if not then adds user's inputed data to the JSON file. If there are errors a error message window will open telling user about the error/s.
         Args: first_name : str (the first name that the user has inputed), family_name: str (the family name taht the user has inputed) item : str (the item name that user has inputed), quantity : int (the item quantity that the user has inputed)
@@ -302,7 +302,7 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
             self.family_name_entry.configure(foreground= "red") # Changing the text on the name entrybox to red to show user there is an error there.
         if not item.replace(" ", "").isalpha() or not item: # Error checking for invalid item name.
             if error_text: error_text += ", "
-            if not item : error_text += " item name"
+            if not item : error_text += " item name (Select an item)"
             elif not item.replace(" ", "").isalpha(): error_text += " item name (No numbers/symbols)" # Error message if there are numbers or symbols. 
             self.item_entry.configure(foreground= "red") # Changing the text on the item entrybox to red to show user there is an error there.
         if not quantity or not quantity.isdigit() or int(quantity)>500 or int(quantity)<1: # Error checking for invalid item quantity.
@@ -321,12 +321,12 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
             self.page_amount += 1 # Increasing the page amount by one since we have added one receipt data to receipt_list.
             self.index = 0 if self.index == -1 else self.page_amount - 1 # Changes the index to match where the newly added receipt data is placed in receipt_list.
             with open("storage.json", 'w') as file: json.dump(data, file, indent= 4) # Adds the updated receipt_list and receipt_numbers to the JSON file.
-            self.first_name_entry.delete(0,END),self.family_name_entry.delete(0, END),self.item_entry.delete(0,END),self.amount_entry.delete(0,END) # Deletes the text in all of the entryboxes. 
-            self.Receipt_shifting() # Run the Receipt_shifting function to update the display window to show the newly added receipt data. 
-            try: self.All_search( self.adv_search_entry.get().strip()) # If advanced window is open, update the table to also show the newly added receipt data.
+            self.first_name_entry.delete(0,END),self.family_name_entry.delete(0, END),self.item_entry.set(""),self.amount_entry.delete(0,END) # Deletes the text in all of the entryboxes. 
+            self.receipt_shifting() # Run the receipt_shifting function to update the display window to show the newly added receipt data. 
+            try: self.all_search( self.adv_search_entry.get().strip()) # If advanced window is open, update the table to also show the newly added receipt data.
             except: pass 
         
-    def Navagation_buttons(self, button):  
+    def navagation_buttons(self, button):  
         '''
         Description: Lets the user change the receipt that is being displayed on the main window by clicking on the left/right navagation buttons. 
         Args: button : str (which way the user wants to shift the receipt data display)
@@ -335,10 +335,10 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
             self.index -= 1 
         else: # If right button is clicked then shift index up one.
             self.index += 1
-        self.Receipt_shifting() # Updates the receipt data display to show the new receipt data.
+        self.receipt_shifting() # Updates the receipt data display to show the new receipt data.
     
 
-    def Reset (self):
+    def reset (self):
         '''
         Description: Resets/deletes all the stored data on the JSON file.
         Args: None
@@ -351,10 +351,10 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
             self.index = -1 # Resets index.
             self.page_amount = 0 # Resets page amount.
             receipt_data_display.config(text= f"No receipts\n\n\n\n") # Since there is no data being stored, receipt data display will not be displaying an receipt data.
-            self.page_number.config(text = f"{self.index+1} of {self.page_amount}") # Reset page amount to be 0 of 0. 
+            self.page_number.config(text = f"{self.index+1} of {self.page_amount}") # reset page amount to be 0 of 0. 
             with open("storage.json", 'w') as file: json.dump(data, file, indent= 4) #Removing all stored data in the JSON file.
         
-    def Quit (self):
+    def quit (self):
         '''
         Description: Closes program, including main window and any currently opened sub windows (search all window).
         Args: None
