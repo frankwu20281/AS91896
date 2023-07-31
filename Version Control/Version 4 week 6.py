@@ -1,4 +1,4 @@
-from tkinter import * # The tkinter module is imported to create a visual GUI for the user to interact with.
+from tkinter import * # The tkinter module is imported to create a visual GUI for the user to interact with. 
 from tkinter import ttk, messagebox # From the tkinter module, the ttk module is imported to accesss tkinter's themed widget set, and also from tkinter module the messagebox function is imported to open messagebox's to display infomation.
 import json # The 'json' module is imported in order to effectively work with the saved_data.json file for saving reports. 
 
