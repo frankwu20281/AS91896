@@ -269,7 +269,7 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
         if len(receipt_list) == 0: 
             messagebox.showerror("Error", "There are no receipts to return") # Messagebox to tell the user about the error.
         else:
-            confirmation = messagebox.askyesno('Confirmation','Are you sure you want to return this item?')
+            confirmation = messagebox.askyesno('Confirmation',f'Are you sure you want to return this item?\n(Receipt No: {receipt_list[self.index]["receipt"]})')
             if confirmation:
                     receipt_list.pop(self.index) #Deletes active order from receipt_list and from json file.
                     with open("storage.json", 'w') as file: json.dump(data, file, indent= 4)
