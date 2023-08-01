@@ -309,7 +309,6 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
             elif not item.replace(" ", "").isalpha(): error_text += " item name (No numbers/symbols)" # Error message if there are numbers or symbols. 
             self.item_entry.configure(foreground= "red") # Changing the text on the item entrybox to red to show user there is an error there.
         if not quantity or not quantity.isdigit() or int(quantity)>500 or int(quantity)<1: # Error checking for invalid item quantity.
-            print(len(quantity.split()))
             if error_text : error_text += ", "
             if not quantity : error_text += " item quantity"
             elif not quantity.replace(" ", "").isdigit():  error_text += " item quantity (No words/symbols)" # Error message if there are words or symbols. 
