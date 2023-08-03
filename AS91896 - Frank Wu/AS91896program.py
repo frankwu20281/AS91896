@@ -137,8 +137,6 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
         self.adv_search_entry.bind ("<KeyRelease>", lambda event: self.all_search( self.adv_search_entry.get().strip()))
         self.adv_search_entry.pack(padx= 10, fill= X)
         # Treeview table to display all of the programs stored receipt data, and scrollbar for the table. 
-        
-        # Treeview table that displays receipt data. 
         scrollbar = ttk.Scrollbar(new_window,orient ="vertical")
         self.tree_table = ttk.Treeview(new_window, columns=('Receipt', 'Name', 'Item', 'Quantity'), show = 'headings', yscrollcommand = scrollbar.set)
         self.tree_table.bind('<<TreeviewSelect>>', (lambda event: self.table_selection(self,self.tree_table.item(self.tree_table.selection()))))
@@ -244,7 +242,6 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
                     break
                 else: # If the users input matches none of the receipts in the receipt_list, then change the searchbar's text to red to indicate an error to the user.
                     self.search_entry.config(foreground= 'red')
-        
                     
     def receipt_shifting (self):
         '''
