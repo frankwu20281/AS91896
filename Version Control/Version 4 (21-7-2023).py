@@ -1,4 +1,4 @@
-from tkinter import * # The tkinter module is imported to create a visual GUI for the user to interact with. 
+from tkinter import * # The tkinter module is imported to create a visual GUI for the user to interact with.
 from tkinter import ttk, messagebox # From the tkinter module, the ttk module is imported to accesss tkinter's themed widget set, and also from tkinter module the messagebox function is imported to open messagebox's to display infomation.
 import json # The 'json' module is imported in order to effectively work with the saved_data.json file for saving reports. 
 
@@ -137,8 +137,6 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
         self.adv_search_entry.bind ("<KeyRelease>", lambda event: self.all_search( self.adv_search_entry.get().strip()))
         self.adv_search_entry.pack(padx= 10, fill= X)
         # Treeview table to display all of the programs stored receipt data, and scrollbar for the table. 
-        
-        # Treeview table that displays receipt data. 
         scrollbar = ttk.Scrollbar(new_window,orient ="vertical")
         self.tree_table = ttk.Treeview(new_window, columns=('Receipt', 'Name', 'Item', 'Quantity'), show = 'headings', yscrollcommand = scrollbar.set)
         self.tree_table.bind('<<TreeviewSelect>>', (lambda event: self.table_selection(self,self.tree_table.item(self.tree_table.selection()))))
@@ -244,7 +242,6 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
                     break
                 else: # If the users input matches none of the receipts in the receipt_list, then change the searchbar's text to red to indicate an error to the user.
                     self.search_entry.config(foreground= 'red')
-        
                     
     def receipt_shifting (self):
         '''
@@ -269,7 +266,7 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
         if len(receipt_list) == 0: 
             messagebox.showerror("Error", "There are no receipts to return") # Messagebox to tell the user about the error.
         else:
-            confirmation = messagebox.askyesno('Confirmation','Are you sure you want to return this item?')
+            confirmation = messagebox.askyesno('Confirmation',f'Are you sure you want to return this item?\n(Receipt No: {receipt_list[self.index]["receipt"]})')
             if confirmation:
                     receipt_list.pop(self.index) #Deletes active order from receipt_list and from json file.
                     with open("storage.json", 'w') as file: json.dump(data, file, indent= 4)
@@ -309,7 +306,6 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
             elif not item.replace(" ", "").isalpha(): error_text += " item name (No numbers/symbols)" # Error message if there are numbers or symbols. 
             self.item_entry.configure(foreground= "red") # Changing the text on the item entrybox to red to show user there is an error there.
         if not quantity or not quantity.isdigit() or int(quantity)>500 or int(quantity)<1: # Error checking for invalid item quantity.
-            print(len(quantity.split()))
             if error_text : error_text += ", "
             if not quantity : error_text += " item quantity"
             elif not quantity.replace(" ", "").isdigit():  error_text += " item quantity (No words/symbols)" # Error message if there are words or symbols. 
