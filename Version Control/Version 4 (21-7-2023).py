@@ -73,7 +73,7 @@ class Main_window(): # The Main_window class initiates the GUI part of the progr
         self.family_name_entry.grid(row=1, column=1, pady= 5, padx= 5, ipadx= 10)
         # Label that asks user to input item name, and entrybox to let user input.
         self.item_label = ttk.Label(entry_frame, text= "Enter item ").grid(row=2, column= 0, pady= 5, padx= 5, sticky= W)
-        self.item_entry = ttk.Combobox(entry_frame, values= ["Balloons","Cakes","Cupcakes","Party Streamers", "Party Poppers","Juice Boxes","Lolly Bags"], state= "readonly" )
+        self.item_entry = ttk.Combobox(entry_frame, values= ["Banners", "Balloons","Cakes","Cupcakes","Chairs", "Party Streamers", "Party Poppers","Juice Boxes","Lolly Bags","Tables"], state= "readonly" )
         self.item_entry.grid(row=2, column=1, pady= 5, padx= 5)
         # Label that asks user to input item amount, and entrybox to let user input.
         self.amount_label = ttk.Label(entry_frame, text= "Enter item quantity").grid(row=3, column= 0, pady= 5, padx= 5, sticky= W)    
